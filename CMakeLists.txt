@@ -15,8 +15,8 @@ set(CMAKE_CXX_FLAGS "-O3")
 add_executable(example_position examples/example_position.cpp)
 target_link_libraries(example_position ${EXTRA_LIBS})
 
-add_executable(test examples/test.cpp)
-target_link_libraries(test ${EXTRA_LIBS})
+add_executable(rb_test examples/rb_test.cpp)
+target_link_libraries(rb_test ${EXTRA_LIBS})
 
 add_executable(example_velocity examples/example_velocity.cpp)
 target_link_libraries(example_velocity ${EXTRA_LIBS})
@@ -27,8 +27,8 @@ target_link_libraries(example_torque ${EXTRA_LIBS})
 add_executable(example_walk examples/example_walk.cpp)
 target_link_libraries(example_walk ${EXTRA_LIBS})
 
-add_executable(example_wirelessHandle examples/example_wirelessHandle.cpp)
-target_link_libraries(example_wirelessHandle ${EXTRA_LIBS})
+# add_executable(example_wirelessHandle examples/example_wirelessHandle.cpp)
+# target_link_libraries(example_wirelessHandle ${EXTRA_LIBS})
 
 
 # one pc multi process

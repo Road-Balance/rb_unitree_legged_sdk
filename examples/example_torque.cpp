@@ -55,7 +55,8 @@ void Custom::RobotControl()
         if(torque < -5.0f) torque = -5.0f;
 
         cmd.motorCmd[FR_1].q = PosStopF;
-        cmd.motorCmd[FR_1].dq = VelStopF;
+        // cmd.motorCmd[FR_1].dq = VelStopF;
+        cmd.motorCmd[FR_1].dq = 10000;
         cmd.motorCmd[FR_1].Kp = 0;
         cmd.motorCmd[FR_1].Kd = 0;
         cmd.motorCmd[FR_1].tau = torque;
