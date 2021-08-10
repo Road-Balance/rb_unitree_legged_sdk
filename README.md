@@ -39,6 +39,11 @@ Run examples with 'sudo' for memory locking.
 
 * Example 3 - walking control
 
+<p>
+    <img src="./img/a1_walk.gif" height="200" />
+</p>
+
+
 ### Only Mini-PC
 * Run examples below examples/one_pc.
 
