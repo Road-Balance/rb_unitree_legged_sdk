@@ -1,6 +1,8 @@
 This sdk is mainly used for communication between PC and main controller board.
 It also can be used in other PCs with UDP.
 
+
+| This repo is forked from Unitree Robotics.Co.Ltd. and All copyright reserved for them
 ## Dependencies
 * [Boost](http://www.boost.org) (version 1.5.4 or higher)
 * [CMake](http://www.cmake.org) (version 2.8.3 or higher)
