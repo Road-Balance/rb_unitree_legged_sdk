@@ -8,12 +8,12 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 
 #include "comm.h"
 #include "control.h"
-#include "udp.h"
-#include "loop.h"
 #include "lcm.h"
+#include "loop.h"
 #include "quadruped.h"
+#include "udp.h"
 #include <boost/bind.hpp>
 
-#define UTK UNITREE_LEGGED_SDK    //short name
+#define UTK UNITREE_LEGGED_SDK // short name
 
 #endif
