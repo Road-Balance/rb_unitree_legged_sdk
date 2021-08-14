@@ -25,6 +25,25 @@ make
 ## Usage
 Run examples with 'sudo' for memory locking.
 
+* Example 1 - position control
+
+<p>
+    <img src="./img/a1_position.gif" height="200" />
+    <img src="./img/a1_position_2.gif" height="200" />
+</p>
+
+* Example 2 - velocity control
+
+
+* Example 3 - torque control
+
+* Example 3 - walking control
+
+<p>
+    <img src="./img/a1_walk.gif" height="200" />
+</p>
+
+
 ### Only Mini-PC
 * Run examples below examples/one_pc.
 

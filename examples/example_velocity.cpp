@@ -50,19 +50,19 @@ void Custom::RobotControl()
     cmd.motorCmd[RL_0].tau = +0.65f;
 
     if( motiontime >= 500){
-        float speed = 1 * sin(3*M_PI*Tpi/1000.0);
+        float speed = 8 * sin(3*M_PI*Tpi/1000.0);
 
-        cmd.motorCmd[FL_2].q = PosStopF;
-        cmd.motorCmd[FL_2].dq = speed;
-        cmd.motorCmd[FL_2].Kp = 0;
-        cmd.motorCmd[FL_2].Kd = 4;
-        cmd.motorCmd[FL_2].tau = 0.0f;
+        cmd.motorCmd[FR_1].q = PosStopF;
+        cmd.motorCmd[FR_1].dq = speed;
+        cmd.motorCmd[FR_1].Kp = 0;
+        cmd.motorCmd[FR_1].Kd = 4;
+        cmd.motorCmd[FR_1].tau = 0.0f;
         Tpi++;
     }
 
     if(motiontime > 10){
-        control.PowerProtect(cmd, state, 1);
-        control.PositionProtect(cmd, state, 0.087);
+        // control.PowerProtect(cmd, state, 1);
+        // control.PositionProtect(cmd, state, 0.087);
     }
 
     udp.SetSend(cmd);

@@ -81,10 +81,10 @@ void Custom::RobotControl() {
       Kd[1] = 1.0;
       Kd[2] = 1.0;
 
-      // qDes[0] = jointLinearInterpolation(qInit[0], sin_mid_q[0], rate);
-      // qDes[1] = jointLinearInterpolation(qInit[1], sin_mid_q[1], rate);
-      // qDes[2] = jointLinearInterpolation(qInit[2], sin_mid_q[2], rate);
-      qDes[2] = jointLinearInterpolation(-1.8, sin_mid_q[2], rate);
+      qDes[0] = jointLinearInterpolation(qInit[0], sin_mid_q[0], rate);
+      qDes[1] = jointLinearInterpolation(qInit[1], sin_mid_q[1], rate);
+      qDes[2] = jointLinearInterpolation(qInit[2], sin_mid_q[2], rate);
+      // qDes[2] = jointLinearInterpolation(-1.8, sin_mid_q[2], rate);
     }
     double sin_joint1, sin_joint2;
     // last, do sine wave
@@ -92,23 +92,23 @@ void Custom::RobotControl() {
       sin_count++;
       sin_joint1 = 0.6 * sin(3 * M_PI * sin_count / 1000.0);
       sin_joint2 = -0.6 * sin(1.8 * M_PI * sin_count / 1000.0);
-      // qDes[0] = sin_mid_q[0];
-      // qDes[1] = sin_mid_q[1];
-      qDes[2] = sin_mid_q[2] + sin_joint2;
+      qDes[0] = sin_mid_q[0] + sin_joint1;
+      qDes[1] = sin_mid_q[1] + sin_joint2;
+      qDes[2] = sin_mid_q[2] + sin_joint1;
       // qDes[2] = sin_mid_q[2];
     }
 
-    // cmd.motorCmd[FR_0].q = qDes[0];
-    // cmd.motorCmd[FR_0].dq = 0;
-    // cmd.motorCmd[FR_0].Kp = Kp[0];
-    // cmd.motorCmd[FR_0].Kd = Kd[0];
-    // cmd.motorCmd[FR_0].tau = -0.65f;
+    cmd.motorCmd[FR_0].q = qDes[0];
+    cmd.motorCmd[FR_0].dq = 0;
+    cmd.motorCmd[FR_0].Kp = Kp[0];
+    cmd.motorCmd[FR_0].Kd = Kd[0];
+    cmd.motorCmd[FR_0].tau = -0.65f;
 
-    // cmd.motorCmd[FR_1].q = qDes[1];
-    // cmd.motorCmd[FR_1].dq = 0;
-    // cmd.motorCmd[FR_1].Kp = Kp[1];
-    // cmd.motorCmd[FR_1].Kd = Kd[1];
-    // cmd.motorCmd[FR_1].tau = 0.0f;
+    cmd.motorCmd[FR_1].q = qDes[1];
+    cmd.motorCmd[FR_1].dq = 0;
+    cmd.motorCmd[FR_1].Kp = Kp[1];
+    cmd.motorCmd[FR_1].Kd = Kd[1];
+    cmd.motorCmd[FR_1].tau = 0.0f;
 
     cmd.motorCmd[FR_2].q = qDes[2];
     cmd.motorCmd[FR_2].dq = 0;
