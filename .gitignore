@@ -1,2 +1,4 @@
 *.json
 build/*
+
+lcm-example/basic_pub_sub/build/*
