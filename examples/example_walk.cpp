@@ -21,7 +21,8 @@ public:
   void RobotControl();
 
   Control control;
-  UDP udp;
+  // UDP udp;
+  UDP udp = {HighLevelType::Sport};
   HighCmd cmd = {0};
   HighState state = {0};
   int motiontime = 0;

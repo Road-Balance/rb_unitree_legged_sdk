@@ -3,7 +3,9 @@ Copyright (c) 2020, Unitree Robotics.Co.Ltd. All rights reserved.
 Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 ************************************************************************/
 
+#include "unitree_legged_sdk/quadruped.h"
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
+
 #include <iostream>
 #include <math.h>
 #include <unistd.h>
@@ -20,7 +22,7 @@ public:
   void RobotControl();
 
   Control control;
-  UDP udp(HighLevelType::Sport);
+  UDP udp = {HighLevelType::Sport};
   LowCmd cmd = {0};
   LowState state = {0};
   int motiontime = 0;

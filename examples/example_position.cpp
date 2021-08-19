@@ -64,7 +64,7 @@ void Custom::RobotControl() {
     // first, get record initial position
     // if( motiontime >= 100 && motiontime < 500){
     if (motiontime >= 0 && motiontime < 10) {
-      qInit[0] = state.motorState[FR_0].q;
+      qInit[0] = state.motorState[FR_0].q; // current angle (unit: radian)
       qInit[1] = state.motorState[FR_1].q;
       qInit[2] = state.motorState[FR_2].q;
     }

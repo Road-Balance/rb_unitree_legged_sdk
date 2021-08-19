@@ -11,13 +11,17 @@ using namespace UNITREE_LEGGED_SDK;
 
 class Custom {
 public:
+  //   UDP(uint16_t localPort, const char *targetIP, uint16_t targetPort,
+  //       int sendLength, int recvLength);
   Custom() : udp(8018, "192.168.2.101", 8017, sizeof(BBB), sizeof(AAA)) {}
   void UDPRecv();
   void UDPSend();
   void Calc();
 
   UDP udp;
+  // Recv
   AAA a;
+  // Send
   BBB b;
   float dt = 0.01;
 };
