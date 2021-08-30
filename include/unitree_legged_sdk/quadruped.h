@@ -5,7 +5,7 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 
 #ifndef _UNITREE_LEGGED_QUADRUPED_H_
 #define _UNITREE_LEGGED_QUADRUPED_H_
-
+#include <stdint.h>
 namespace UNITREE_LEGGED_SDK {
 
 enum class LeggedType { Aliengo, A1 };
