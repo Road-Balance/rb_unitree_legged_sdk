@@ -7,7 +7,8 @@
 // #include "supportLib.hpp"
 
 const double pi = M_PI; 
-const Eigen::Matrix4d Iden4d = Eigen::Matrix<double, 4, 4>::Identity();
+// Eigen::Matrix4d Iden4d = Eigen::Matrix<double, 4, 4>::Identity();
+
 
 std::vector<double> createDomain(const double start, const double end, const double step)
 {
@@ -25,6 +26,13 @@ double Deg2rad(double angle)
     return rad;
 }
 
+double Rad2deg(double rad)
+{
+    double angle = rad * 180 / pi;
+
+    return angle;
+}
+
 int Factorial(int num)
 {
     int result = 1;
@@ -38,6 +46,18 @@ int Factorial(int num)
     }
 
     return result;
+}
+
+std::vector<double> EigenXdTovec(Eigen::VectorXd EigenXdvec)
+{
+    std::vector<double> vec;
+    vec.resize(EigenXdvec.size());
+    for(int i = 0; i < EigenXdvec.size(); i++)
+    {
+        vec[i] = EigenXdvec[i];
+    }
+
+    return vec;
 }
 
 int BinomialFactor(int n, int k)
@@ -77,19 +97,20 @@ Eigen::Vector3d CalculateBezierSwing(double phi_sw, double V, double angle)
     double c = cos(Deg2rad(angle));
     double s = sin(Deg2rad(angle));
 
-    Eigen::VectorXd X_(10), Y_(10), Z_(10), X(10), Y(10), Z(10); 
+    Eigen::VectorXd X(10), Y(10), Z(10);
+    // Eigen::VectorXd X_(10), Y_(10), Z_(10);  
 
-    // X_ <<    0.112, -0.165, -0.198, -0.198, -0.198, 0.0, 0.0, 0.0, 0.198, 0.198, 0.158, 0.112; // (12,1)
-    // Y_ <<    0.05, 0.06, 0.07, 0.07, 0.0, -0.0, -0.07, -0.07, -0.06, -0.05, 0.0, 0.0; 
-    // Z_ <<    -0.310, -0.310, -0.231, -0.231, -0.231, -0.244, -0.244, -0.211, -0.211, -0.211, -0.310, -0.310;
+    // X <<    0.112, -0.165, -0.198, -0.198, -0.198, 0.0, 0.0, 0.0, 0.198, 0.198, 0.158, 0.112; // (12,1)
+    // Y <<    0.05, 0.06, 0.07, 0.07, 0.0, -0.0, -0.07, -0.07, -0.06, -0.05, 0.0, 0.0; 
+    // Z <<    -0.310, -0.310, -0.231, -0.231, -0.231, -0.244, -0.244, -0.211, -0.211, -0.211, -0.310, -0.310;
     
-    X_ <<    -0.05, -0.06, -0.07, -0.07, 0.0, 0.0, 0.07, 0.07, 0.06, 0.05; // (10,1)
-    Y_ <<    0.05, 0.06, 0.07, 0.07, 0.0, -0.0, -0.07, -0.07, -0.06, -0.05; 
-    Z_ <<    0.0, 0.0, 0.05, 0.05, 0.05, 0.06, 0.06, 0.06, 0.0, 0.0;
+    X <<    -0.05, -0.06, -0.07, -0.07, 0.0, 0.0, 0.07, 0.07, 0.06, 0.05; // (10,1)
+    Y <<    0.05, 0.06, 0.07, 0.07, 0.0, -0.0, -0.07, -0.07, -0.06, -0.05; 
+    Z<<    0.0, 0.0, 0.05, 0.05, 0.05, 0.06, 0.06, 0.06, 0.0, 0.0;
 
-    X = X_ * (fabs(V) * c);
-    Y = Y_ * (fabs(V) * s);
-    Z = Z_ * fabs(V);
+    X  *= (fabs(V) * c);
+    Y  *= (fabs(V) * s);
+    Z  *= fabs(V);
 
     Eigen::Vector3d SwingPositon(0, 0, 0);
 
@@ -109,7 +130,7 @@ std::vector<Eigen::Matrix4d> BodyIK(Eigen::Vector3d rot, Eigen::Vector3d center)
 {
     Eigen::Matrix4d Rx, Ry, Rz, T, Rxyz_T, Tlf, Trf, Tlb, Trb;
     double sHp(sin(pi/2)), cHp(cos(pi/2));
-    double L(360.0), W(80.0);
+    double L(360.0), W(80.0);// 240 80
     
     Rx <<   1,            0,              0,              0,
             0,            cos(rot[0]),    -sin(rot[0]),   0,
@@ -154,14 +175,16 @@ std::vector<Eigen::Matrix4d> BodyIK(Eigen::Vector3d rot, Eigen::Vector3d center)
 
 Eigen::Vector3d LegIK(Eigen::Vector4d Lp)
 {
-    double l1(80), l2(100), l3(210), l4(220);
+    double l1(80), l2(100), l3(210), l4(220); // 50 20 100 100
     double D, F, G, H;
     double x(Lp[0]), y(Lp[1]), z(Lp[2]);
     Eigen::Vector3d theta;
     
-    F=sqrt(pow(x, 2) + pow(y, 2) - pow(l1,2));
-    // if(F)
-    //     F = l1;
+    if(pow(x, 2) + pow(y, 2) - pow(l1,2) < 0)
+        F = l1;
+    else
+        F=sqrt(pow(x, 2) + pow(y, 2) - pow(l1,2));
+
 
     G = F - l2;
     H = sqrt(pow(G, 2) + pow(z, 2));
@@ -169,10 +192,11 @@ Eigen::Vector3d LegIK(Eigen::Vector4d Lp)
     theta[0] = -atan2(y, x) - atan2(F, -l1);
 
     D=(pow(H, 2) - pow(l3, 2) - pow(l4, 2))/(2 * l3 * l4);
+    if(-1 < D || D < 1)
+        theta[2] = acos(D);
+    else
+        theta[2] = 0;
 
-    theta[2] = acos(D);
-    // if(theta[2])
-    //     theta[2] = 0;
     
     theta[1] = atan2(z,G) - atan2(l4 * sin(theta[2]), l3 + l4 * cos(theta[2]));
     // std::cout << "legik result : " << theta << std::endl;
@@ -182,18 +206,19 @@ Eigen::Vector3d LegIK(Eigen::Vector4d Lp)
 
 Eigen::VectorXd CalcIK(Eigen::Matrix4d RobotLp, Eigen::Vector3d angles, Eigen::Vector3d center)
 {
-    // double omega(angles[0]), phi(angles[1]), psi(angles[2]);
-    // double xm(center[0]), ym(center[1]), zm(center[2]);
+    Eigen::Matrix4d Iden4d;
+    Iden4d << -1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1;
     Eigen::VectorXd motorRadian(12);
 
     std::vector<Eigen::Matrix4d> trans = BodyIK(angles, center);
-    std::cout << trans[0] << std::endl;
     Eigen::Matrix4d Tlf(trans[0]), Trf(trans[1]), Tlb(trans[2]), Trb(trans[3]);
     Eigen::Vector4d Lp1(Tlf.inverse() * RobotLp.row(0).transpose()), 
                     Lp2(Iden4d * Trf.inverse() * RobotLp.row(1).transpose()),
                     Lp3(Tlb.inverse() * RobotLp.row(2).transpose()),
                     Lp4(Iden4d * Trb.inverse() * RobotLp.row(3).transpose());
-    
     
     motorRadian <<      LegIK(Lp1)[0], LegIK(Lp1)[1], LegIK(Lp1)[2],
                         LegIK(Lp2)[0], LegIK(Lp2)[1], LegIK(Lp2)[2],

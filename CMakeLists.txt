@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(unitree_legged_sdk)
 
-include_directories(include)
+
+include_directories(include
+"/usr/include/eigen3")
 
 link_directories(lib)
 
@@ -17,6 +19,10 @@ target_link_libraries(example_position ${EXTRA_LIBS})
 
 add_executable(rb_test examples/rb_test.cpp)
 target_link_libraries(rb_test ${EXTRA_LIBS})
+
+add_executable(bezier_test examples/bezier_test.cpp
+include/unitree_legged_sdk/pbPlots.cpp include/unitree_legged_sdk/supportLib.cpp)
+target_link_libraries(bezier_test ${EXTRA_LIBS})
 
 add_executable(example_velocity examples/example_velocity.cpp)
 target_link_libraries(example_velocity ${EXTRA_LIBS})

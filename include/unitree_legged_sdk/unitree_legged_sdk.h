@@ -13,6 +13,7 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 #include "quadruped.h"
 #include "safety.h"
 #include "udp.h"
+#include "kinematics.h"
 #include <boost/bind.hpp>
 
 
