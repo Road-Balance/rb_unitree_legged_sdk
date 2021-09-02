@@ -1,14 +1,18 @@
+#pragma once
+
+
 #include <iostream>
 #include <cmath>
 #include <Eigen/Dense> 
 #include <vector>
+#include "comm.h"
 
 // #include "pbPlots.hpp"
 // #include "supportLib.hpp"
 
 const double pi = M_PI; 
 // Eigen::Matrix4d Iden4d = Eigen::Matrix<double, 4, 4>::Identity();
-
+UNITREE_LEGGED_SDK::LowCmd cmd;
 
 std::vector<double> createDomain(const double start, const double end, const double step)
 {
@@ -227,5 +231,23 @@ Eigen::VectorXd CalcIK(Eigen::Matrix4d RobotLp, Eigen::Vector3d angles, Eigen::V
 
 
     return motorRadian;
+
+}
+
+// Control Motor position, speed, tauque
+
+void ControlMotor(  const int target_leg, 
+                    const float q_, 
+                    const float tau_, 
+                    const float dq_ = 0, 
+                    const float Kp_ = 5.0, 
+                    const float Kd_ = 1.0 )
+{
+    cmd.motorCmd[target_leg].q = q_;
+    cmd.motorCmd[target_leg].dq = dq_;
+    cmd.motorCmd[target_leg].tau = tau_;
+    cmd.motorCmd[target_leg].Kp = Kp_;
+    cmd.motorCmd[target_leg].Kd = Kd_;
+
 
 }
