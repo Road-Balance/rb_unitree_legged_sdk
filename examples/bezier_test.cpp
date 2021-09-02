@@ -8,6 +8,7 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 #include <cmath>
 #include <stdint.h>
 #include <stdio.h>
+#include <conio.h>
 
 #include "unitree_legged_sdk/pbPlots.hpp"
 #include "unitree_legged_sdk/supportLib.hpp"
@@ -157,7 +158,7 @@ void Custom::RobotControl()
         }
 
         Eigen::Matrix4d RobotLegPosition;
-        RobotLegPosition << FeetPosition[0] * pow(10, 3), FeetPosition[1] * pow(10, 3), FeetPosition[2] * pow(10, 3), 1,
+        RobotLegPosition << FeetPosition[0], FeetPosition[1], FeetPosition[2], 1,
                             100, -100, -100, 1,
                             -100, -100, 1, 1,
                             -100, -100, -100, 1;

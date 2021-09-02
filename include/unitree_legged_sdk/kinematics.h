@@ -134,7 +134,7 @@ std::vector<Eigen::Matrix4d> BodyIK(Eigen::Vector3d rot, Eigen::Vector3d center)
 {
     Eigen::Matrix4d Rx, Ry, Rz, T, Rxyz_T, Tlf, Trf, Tlb, Trb;
     double sHp(sin(pi/2)), cHp(cos(pi/2));
-    double L(360.0), W(80.0);// 240 80
+    double L(0.3610), W(0.094);// 240 80
     
     Rx <<   1,            0,              0,              0,
             0,            cos(rot[0]),    -sin(rot[0]),   0,
@@ -179,7 +179,7 @@ std::vector<Eigen::Matrix4d> BodyIK(Eigen::Vector3d rot, Eigen::Vector3d center)
 
 Eigen::Vector3d LegIK(Eigen::Vector4d Lp)
 {
-    double l1(80), l2(100), l3(210), l4(220); // 50 20 100 100
+    double l1(0.0838), l2(0.0), l3(0.2), l4(0.2); // 50 20 100 100
     double D, F, G, H;
     double x(Lp[0]), y(Lp[1]), z(Lp[2]);
     Eigen::Vector3d theta;
