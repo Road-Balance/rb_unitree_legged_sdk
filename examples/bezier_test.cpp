@@ -8,7 +8,7 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 #include <cmath>
 #include <stdint.h>
 #include <stdio.h>
-#include <conio.h>
+// #include <conio.h>
 
 #include "unitree_legged_sdk/pbPlots.hpp"
 #include "unitree_legged_sdk/supportLib.hpp"
@@ -38,9 +38,9 @@ public:
   int rate_count = 0;
 
   const double StanceTime = 0.5; // 0 ~ 1
-  const double V = 1.0;
+  const double V = 2.0;
   const double angle = 0.0;
-  std::vector<double> CurrentTime = createDomain(0.0, 1.0, 0.01);
+  std::vector<double> CurrentTime = createDomain(0.0, 1.0, 0.0001);
   Eigen::Vector3d rotation = {0, 0, 0};
   Eigen::Vector3d center = {0, 0, 0};
   std::vector<double> x, y, z;
@@ -85,12 +85,12 @@ void Custom::RobotControl()
     // read initial position
     if (motiontime >= 0 && motiontime < 10) 
     {
-      qInit[0] = state.motorState[FL_0].q;
-      qInit[1] = state.motorState[FL_1].q;
-      qInit[2] = state.motorState[FL_2].q;
+      qInit[0] = state.motorState[FR_0].q;
+      qInit[1] = state.motorState[FR_1].q;
+      qInit[2] = state.motorState[FR_2].q;
       
       if(motiontime == 9)
-        preparePose = true;
+        PreparePose = true;
     }
 
     // move to the prepare pose for bezier curve
@@ -103,24 +103,24 @@ void Custom::RobotControl()
       curr_qDes[1] = jointLinearInterpolation(qInit[1], final_qDes[1], rate);
       curr_qDes[2] = jointLinearInterpolation(qInit[2], final_qDes[2], rate);      
     
-      ControlMotor(FL_0, curr_qDes[0], 0.8f);
-      ControlMotor(FL_1, curr_qDes[1], 0.8f);
-      ControlMotor(FL_2, curr_qDes[2], 0.8f);
+      ControlMotor(FR_0, curr_qDes[0], 0.8f);
+      ControlMotor(FR_1, curr_qDes[1], 0.8f);
+      ControlMotor(FR_2, curr_qDes[2], 0.8f);
       
       if( curr_qDes == final_qDes)
       {
         BezierCurve = true;
-        preparePose = false;
-        while(1)
-        {
-          int key = getch();
-          if(key == 13)
-            break;
-        }
+        PreparePose = false;
+        // while(1)
+        // {
+        //   int key = getch();
+        //   if(key == 13)
+        //     break;
+        // }
       }
     }
       
-    if(BezierCurve)
+    if(true)
     {  
       // RGBABitmapImageReference *imageReference = CreateRGBABitmapImageReference();
 
@@ -139,9 +139,9 @@ void Custom::RobotControl()
           // y.push_back(FeetPosition[1]);
           // z.push_back(FeetPosition[2]);
           std::cout << " Stance !!   " << " stanceratio : " << StanceRatio << "    ";
-          std::cout << " X : " << FeetPosition[0] * pow(10, 3) 
-                    << " Y : " << FeetPosition[1] * pow(10, 3) 
-                    << " Z : " << FeetPosition[2] * pow(10, 3) << std::endl;
+          std::cout << " X : " << FeetPosition[0]
+                    << " Y : " << FeetPosition[1] 
+                    << " Z : " << FeetPosition[2] << std::endl;
         }
         else
         {
@@ -152,38 +152,60 @@ void Custom::RobotControl()
           // z.push_back(FeetPosition[2]);
           std::cout << std::endl;
           std::cout << " Swing !!   " << " swingratio : " << SwingRatio << "    ";
-          std::cout << " X : " << FeetPosition[0] * pow(10, 3) 
-                    << " Y : " << FeetPosition[1] * pow(10, 3) 
-                    << " Z : " << FeetPosition[2] * pow(10, 3) << std::endl;
+          std::cout << " X : " << FeetPosition[0] 
+                    << " Y : " << FeetPosition[1] 
+                    << " Z : " << FeetPosition[2] << std::endl;
         }
 
         Eigen::Matrix4d RobotLegPosition;
-        RobotLegPosition << FeetPosition[0], FeetPosition[1], FeetPosition[2], 1,
-                            100, -100, -100, 1,
-                            -100, -100, 1, 1,
-                            -100, -100, -100, 1;
+        RobotLegPosition << FeetPosition[0],  FeetPosition[1], -0.32 + FeetPosition[2], 1,
+                            0.1, -0.1, -0.1, 1,
+                            -0.1, -0.1, 0.1, 1,
+                            -0.1, -0.1, -0.1, 1;
         // RobotLegPosition << 100, -100, 100, 1,
         //                     100, -100, -100, 1,
         //                     -100, -100, 100, 1,
         //                     -100, -100, -100, 1;
         
-        MotorRadian = CalcIK(RobotLegPosition, rotation, center);
+        // MotorRadian = CalcIK(RobotLegPosition, rotation, center);
         
-        for(int i = 0; i < MotorRadian.size(); i++)
-        {
-          MotorDeg[i] = Rad2deg(MotorRadian[i]);
-        }
+        Eigen::Vector4d LegPoint;
+        LegPoint << RobotLegPosition(0, 0), RobotLegPosition(0, 2), RobotLegPosition(0, 1), 1.0;
+
+        Eigen::Vector3d theta = LegIK(LegPoint);
+        std::cout <<  Rad2deg(theta[0]) << "    " <<
+                      Rad2deg(theta[1]) << "    " <<
+                      Rad2deg(theta[2]) << std::endl;
         
-        std::cout << MotorDeg.transpose() << std::endl;  
+
+
+        // for(int i = 0; i < MotorRadian.size(); i++)
+        // {
+        //   MotorDeg[i] = Rad2deg(MotorRadian[i]);
+        // }
         
-        std::vector<double> MotorRad;
-        MotorRad = EigenXdTovec(MotorRadian);
+        // std::cout << MotorDeg[0] << "        " <<
+        // MotorDeg[1] << "        " <<
+        // MotorDeg[2] << std::endl;  
+        
+        // std::vector<double> MotorRad;
+        // MotorRad = EigenXdTovec(MotorRadian);
 
         
-        ControlMotor(FL_0, MotorRadian[3], 0.8f);
-        ControlMotor(FL_1, MotorRadian[4], 0.8f);
-        ControlMotor(FL_2, MotorRadian[5], 0.8f);
-        
+        // ControlMotor(FR_0, MotorRadian[3], 0.8f);
+        // ControlMotor(FR_1, MotorRadian[4], 0.8f);
+        // ControlMotor(FR_2, (float)(-MotorRadian[2]), 0.8f);
+        cmd.motorCmd[FR_2].q = (float)(-theta[2]);
+        cmd.motorCmd[FR_2].dq = 0.0;
+        cmd.motorCmd[FR_2].Kp = 5.0;
+        cmd.motorCmd[FR_2].Kd = 1.0;
+        cmd.motorCmd[FR_2].tau = 0.8f;
+
+        cmd.motorCmd[FR_1].q = (float)(-theta[1]);
+        cmd.motorCmd[FR_1].dq = 0.0;
+        cmd.motorCmd[FR_1].Kp = 5.0;
+        cmd.motorCmd[FR_1].Kd = 1.0;
+        cmd.motorCmd[FR_1].tau = 0.8f;
       }
 
         // DrawScatterPlot(imageReference, 1000, 300, &x, &z);

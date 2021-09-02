@@ -3,7 +3,8 @@ project(unitree_legged_sdk)
 
 
 include_directories(include
-"/usr/include/eigen3")
+"/usr/include/eigen3"
+"/usr/local/include/eigen3")
 
 link_directories(lib)
 

@@ -42,8 +42,8 @@ public:
   float read_initial_position = 0;
 
   float speed = 3.0;
-  const int target_leg = FL_1;
-  float target_position = -30 * pi / 180;
+  const int target_leg = FR_2;
+  float target_position = -150 * pi / 180;
   float state_angle = 0;
   float state_tau = 0;
 };
@@ -126,7 +126,7 @@ void Custom::RobotControl() {
     cmd.motorCmd[target_leg].dq = speed;
     cmd.motorCmd[target_leg].Kp = Kp[2];
     cmd.motorCmd[target_leg].Kd = Kd[2];
-    cmd.motorCmd[target_leg].tau = 0.8f;
+    cmd.motorCmd[target_leg].tau = 0.0f;
 
     // while(1)
     {
