@@ -35,7 +35,8 @@ public:
   int motiontime = 0;
   float dt = 0.002; // 0.001~0.01
   const double pi = M_PI;
-  int rate_count = 0;
+  int pre_rate_count = 0;
+  int bezier_rate_count = 0;
 
   const double StanceTime = 0.5; // 0 ~ 1
   const double V = 2.0;
@@ -94,10 +95,10 @@ void Custom::RobotControl()
     }
 
     // move to the prepare pose for bezier curve
-    if(PreparePose)
+    if(false)
     {
-      rate_count++;
-      double rate = rate_count / 200.0;
+      pre_rate_count++;
+      double rate = pre_rate_count / 200.0;
 
       curr_qDes[0] = jointLinearInterpolation(qInit[0], final_qDes[0], rate);
       curr_qDes[1] = jointLinearInterpolation(qInit[1], final_qDes[1], rate);
@@ -123,10 +124,11 @@ void Custom::RobotControl()
     if(true)
     {  
       // RGBABitmapImageReference *imageReference = CreateRGBABitmapImageReference();
+        bezier_rate_count++;
+        double rate = bezier_rate_count / 200.0;
+        double currtime = jointLinearInterpolation(0.0, 1.0, rate);
+        if(rate == 1 ) bezier_rate_count = 0;
 
-
-      for(auto currtime : CurrentTime)
-      {
         Eigen::Vector3d FeetPosition;
         Eigen::VectorXd MotorRadian(12);
         Eigen::VectorXd MotorDeg(12);
@@ -206,7 +208,7 @@ void Custom::RobotControl()
         cmd.motorCmd[FR_1].Kp = 5.0;
         cmd.motorCmd[FR_1].Kd = 1.0;
         cmd.motorCmd[FR_1].tau = 0.8f;
-      }
+      
 
         // DrawScatterPlot(imageReference, 1000, 300, &x, &z);
         // std::vector<double> *pngData = ConvertToPNG(imageReference -> image);
