@@ -12,7 +12,7 @@
 
 const double pi = M_PI; 
 // Eigen::Matrix4d Iden4d = Eigen::Matrix<double, 4, 4>::Identity();
-UNITREE_LEGGED_SDK::LowCmd cmd;
+// UNITREE_LEGGED_SDK::LowCmd cmd;
 
 std::vector<double> createDomain(const double start, const double end, const double step)
 {
@@ -236,7 +236,7 @@ Eigen::VectorXd CalcIK(Eigen::Matrix4d RobotLp, Eigen::Vector3d angles, Eigen::V
 
 // Control Motor position, speed, tauque
 
-void ControlMotor(  const int target_leg, 
+void ControlMotor(UNITREE_LEGGED_SDK::LowCmd &cmd,  const int target_leg, 
                     const float q_, 
                     const float dq_ = 1.0, 
                     const float Kp_ = 5.0, 
@@ -249,5 +249,5 @@ void ControlMotor(  const int target_leg,
     cmd.motorCmd[target_leg].Kd = Kd_;
     cmd.motorCmd[target_leg].tau = tau_;
 
-
+    
 }

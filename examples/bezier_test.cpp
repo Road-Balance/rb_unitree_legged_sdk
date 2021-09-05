@@ -105,9 +105,9 @@ void Custom::RobotControl()
       curr_qDes[1] = jointLinearInterpolation(qInit[1], final_qDes[1], rate);
       curr_qDes[2] = jointLinearInterpolation(qInit[2], final_qDes[2], rate);      
     
-      ControlMotor(FR_0, curr_qDes[0], 0.0f);
-      ControlMotor(FR_1, curr_qDes[1], 0.0f);
-      ControlMotor(FR_2, curr_qDes[2], 0.0f);
+      ControlMotor(cmd, FR_0, curr_qDes[0], 0.0f);
+      ControlMotor(cmd, FR_1, curr_qDes[1], 0.0f);
+      ControlMotor(cmd, FR_2, curr_qDes[2], 0.0f);
       usleep(10000);
       if( curr_qDes == final_qDes)
       {
@@ -186,86 +186,86 @@ void Custom::RobotControl()
         if(StanceMode)
         {
           // ControlMotor(FR_0, MotorRadian[3], 0.8f);
-          // ControlMotor(FR_1, (float)(-MotorRadian[1]), 1.0, 5.0, 1.0, 3.0f);
-          // ControlMotor(FR_2, (float)(-MotorRadian[2]), 1.0, 5.0, 1.0, 3.0f);
-          cmd.motorCmd[FR_0].q = 0.0;
-          cmd.motorCmd[FR_0].dq = 0.0;
-          cmd.motorCmd[FR_0].Kp = 5.0;
-          cmd.motorCmd[FR_0].Kd = 1.0;
-          cmd.motorCmd[FR_0].tau = 0.0f;
+          ControlMotor(cmd, FR_1, (float)(-MotorRadian[1]), 1.0, 5.0, 1.0, 3.0f);
+          ControlMotor(cmd, FR_2, (float)(-MotorRadian[2]), 1.0, 5.0, 1.0, 3.0f);
+          // cmd.motorCmd[FR_0].q = 0.0;
+          // cmd.motorCmd[FR_0].dq = 0.0;
+          // cmd.motorCmd[FR_0].Kp = 5.0;
+          // cmd.motorCmd[FR_0].Kd = 1.0;
+          // cmd.motorCmd[FR_0].tau = 0.0f;
           
-          cmd.motorCmd[FR_1].q = (float)(-MotorRadian[1]);
-          cmd.motorCmd[FR_1].dq = 0.0;
-          cmd.motorCmd[FR_1].Kp = 5.0;
-          cmd.motorCmd[FR_1].Kd = 1.0;
-          cmd.motorCmd[FR_1].tau = 3.5f;
+          // cmd.motorCmd[FR_1].q = (float)(-MotorRadian[1]);
+          // cmd.motorCmd[FR_1].dq = 0.0;
+          // cmd.motorCmd[FR_1].Kp = 5.0;
+          // cmd.motorCmd[FR_1].Kd = 1.0;
+          // cmd.motorCmd[FR_1].tau = 3.5f;
 
-          cmd.motorCmd[FR_2].q = (-1) * (float)(MotorRadian[2]);
-          cmd.motorCmd[FR_2].dq = 0.0;
-          cmd.motorCmd[FR_2].Kp = 5.0;
-          cmd.motorCmd[FR_2].Kd = 1.0;
-          cmd.motorCmd[FR_2].tau = 3.5f;   
+          // cmd.motorCmd[FR_2].q = (-1) * (float)(MotorRadian[2]);
+          // cmd.motorCmd[FR_2].dq = 0.0;
+          // cmd.motorCmd[FR_2].Kp = 5.0;
+          // cmd.motorCmd[FR_2].Kd = 1.0;
+          // cmd.motorCmd[FR_2].tau = 3.5f;   
 
-          cmd.motorCmd[RR_0].q = 0.0;
-          cmd.motorCmd[RR_0].dq = 0.0;
-          cmd.motorCmd[RR_0].Kp = 5.0;
-          cmd.motorCmd[RR_0].Kd = 1.0;
-          cmd.motorCmd[RR_0].tau = 0.0f;
+          // cmd.motorCmd[RR_0].q = 0.0;
+          // cmd.motorCmd[RR_0].dq = 0.0;
+          // cmd.motorCmd[RR_0].Kp = 5.0;
+          // cmd.motorCmd[RR_0].Kd = 1.0;
+          // cmd.motorCmd[RR_0].tau = 0.0f;
           
-          cmd.motorCmd[RR_1].q = (float)(-MotorRadian[10]);
-          cmd.motorCmd[RR_1].dq = 0.0;
-          cmd.motorCmd[RR_1].Kp = 5.0;
-          cmd.motorCmd[RR_1].Kd = 1.0;
-          cmd.motorCmd[RR_1].tau = 3.5f;
+          // cmd.motorCmd[RR_1].q = (float)(-MotorRadian[10]);
+          // cmd.motorCmd[RR_1].dq = 0.0;
+          // cmd.motorCmd[RR_1].Kp = 5.0;
+          // cmd.motorCmd[RR_1].Kd = 1.0;
+          // cmd.motorCmd[RR_1].tau = 3.5f;
 
-          cmd.motorCmd[RR_2].q = (-1) * (float)(MotorRadian[11]);
-          cmd.motorCmd[RR_2].dq = 0.0;
-          cmd.motorCmd[RR_2].Kp = 5.0;
-          cmd.motorCmd[RR_2].Kd = 1.0;
-          cmd.motorCmd[RR_2].tau = 3.5f;  
+          // cmd.motorCmd[RR_2].q = (-1) * (float)(MotorRadian[11]);
+          // cmd.motorCmd[RR_2].dq = 0.0;
+          // cmd.motorCmd[RR_2].Kp = 5.0;
+          // cmd.motorCmd[RR_2].Kd = 1.0;
+          // cmd.motorCmd[RR_2].tau = 3.5f;  
           
                  
         }
         else  // Swing
         {
           // ControlMotor(FR_0, MotorRadian[3], 0.8f);
-          // ControlMotor(FR_1, (float)(-MotorRadian[1]), 0.0f);
-          // ControlMotor(FR_2, (float)(-MotorRadian[2]), 0.0f);
-          cmd.motorCmd[FR_0].q = 0.0;
-          cmd.motorCmd[FR_0].dq = 0.0;
-          cmd.motorCmd[FR_0].Kp = 5.0;
-          cmd.motorCmd[FR_0].Kd = 1.0;
-          cmd.motorCmd[FR_0].tau = 0.0f;
+          ControlMotor(cmd, FR_1, (float)(-MotorRadian[1]));
+          ControlMotor(cmd, FR_2, (float)(-MotorRadian[2]));
+          // cmd.motorCmd[FR_0].q = 0.0;
+          // cmd.motorCmd[FR_0].dq = 0.0;
+          // cmd.motorCmd[FR_0].Kp = 5.0;
+          // cmd.motorCmd[FR_0].Kd = 1.0;
+          // cmd.motorCmd[FR_0].tau = 0.0f;
           
-          cmd.motorCmd[FR_1].q = (float)(-MotorRadian[1]);
-          cmd.motorCmd[FR_1].dq = 0.0;
-          cmd.motorCmd[FR_1].Kp = 5.0;
-          cmd.motorCmd[FR_1].Kd = 1.0;
-          cmd.motorCmd[FR_1].tau = 0.8f;
+          // cmd.motorCmd[FR_1].q = (float)(-MotorRadian[1]);
+          // cmd.motorCmd[FR_1].dq = 0.0;
+          // cmd.motorCmd[FR_1].Kp = 5.0;
+          // cmd.motorCmd[FR_1].Kd = 1.0;
+          // cmd.motorCmd[FR_1].tau = 0.8f;
 
-          cmd.motorCmd[FR_2].q = (float)(-MotorRadian[2]);
-          cmd.motorCmd[FR_2].dq = 0.0;
-          cmd.motorCmd[FR_2].Kp = 5.0;
-          cmd.motorCmd[FR_2].Kd = 1.0;
-          cmd.motorCmd[FR_2].tau = 0.8f; 
+          // cmd.motorCmd[FR_2].q = (float)(-MotorRadian[2]);
+          // cmd.motorCmd[FR_2].dq = 0.0;
+          // cmd.motorCmd[FR_2].Kp = 5.0;
+          // cmd.motorCmd[FR_2].Kd = 1.0;
+          // cmd.motorCmd[FR_2].tau = 0.8f; 
                     
-          cmd.motorCmd[RR_0].q = 0.0;
-          cmd.motorCmd[RR_0].dq = 0.0;
-          cmd.motorCmd[RR_0].Kp = 5.0;
-          cmd.motorCmd[RR_0].Kd = 1.0;
-          cmd.motorCmd[RR_0].tau = 0.0f;
+          // cmd.motorCmd[RR_0].q = 0.0;
+          // cmd.motorCmd[RR_0].dq = 0.0;
+          // cmd.motorCmd[RR_0].Kp = 5.0;
+          // cmd.motorCmd[RR_0].Kd = 1.0;
+          // cmd.motorCmd[RR_0].tau = 0.0f;
           
-          cmd.motorCmd[RR_1].q = (float)(-MotorRadian[10]);
-          cmd.motorCmd[RR_1].dq = 0.0;
-          cmd.motorCmd[RR_1].Kp = 5.0;
-          cmd.motorCmd[RR_1].Kd = 1.0;
-          cmd.motorCmd[RR_1].tau = 0.8f;
+          // cmd.motorCmd[RR_1].q = (float)(-MotorRadian[10]);
+          // cmd.motorCmd[RR_1].dq = 0.0;
+          // cmd.motorCmd[RR_1].Kp = 5.0;
+          // cmd.motorCmd[RR_1].Kd = 1.0;
+          // cmd.motorCmd[RR_1].tau = 0.8f;
 
-          cmd.motorCmd[RR_2].q = (-1) * (float)(MotorRadian[11]);
-          cmd.motorCmd[RR_2].dq = 0.0;
-          cmd.motorCmd[RR_2].Kp = 5.0;
-          cmd.motorCmd[RR_2].Kd = 1.0;
-          cmd.motorCmd[RR_2].tau = 0.8f;             
+          // cmd.motorCmd[RR_2].q = (-1) * (float)(MotorRadian[11]);
+          // cmd.motorCmd[RR_2].dq = 0.0;
+          // cmd.motorCmd[RR_2].Kp = 5.0;
+          // cmd.motorCmd[RR_2].Kd = 1.0;
+          // cmd.motorCmd[RR_2].tau = 0.8f;             
         }
 
         
