@@ -39,7 +39,7 @@ public:
   int bezier_rate_count = 0;
 
   const double StanceTime = 0.5; // 0 ~ 1
-  const double V = 2.0;
+  const double V = 3.0;
   const double angle = 0.0;
   std::vector<double> CurrentTime = createDomain(0.0, 1.0, 0.0001);
   Eigen::Vector3d rotation = {0, 0, 0};
@@ -91,7 +91,7 @@ void Custom::RobotControl()
       qInit[2] = state.motorState[FR_2].q;
       
       if(motiontime == 9)
-        PreparePose = true;
+        BezierCurve = true;
     }
 
     // move to the prepare pose for bezier curve
@@ -121,7 +121,7 @@ void Custom::RobotControl()
       }
     }
       
-    if(true)
+    if(BezierCurve)
     {  
       // RGBABitmapImageReference *imageReference = CreateRGBABitmapImageReference();
         bezier_rate_count++;
@@ -160,7 +160,7 @@ void Custom::RobotControl()
         }
 
         Eigen::Matrix4d RobotLegPosition;
-        RobotLegPosition << FeetPosition[0],  FeetPosition[1], -0.32 + FeetPosition[2], 1,
+        RobotLegPosition << 0.1805 + FeetPosition[0],  -0.0475 + FeetPosition[1], -0.28 + FeetPosition[2], 1,
                             0.1, -0.1, -0.1, 1,
                             -0.1, -0.1, 0.1, 1,
                             -0.1, -0.1, -0.1, 1;
@@ -169,15 +169,15 @@ void Custom::RobotControl()
         //                     -100, -100, 100, 1,
         //                     -100, -100, -100, 1;
         
-        // MotorRadian = CalcIK(RobotLegPosition, rotation, center);
+        MotorRadian = CalcIK(RobotLegPosition, rotation, center);
         
-        Eigen::Vector4d LegPoint;
-        LegPoint << RobotLegPosition(0, 0), RobotLegPosition(0, 2), RobotLegPosition(0, 1), 1.0;
+        // Eigen::Vector4d LegPoint;
+        // LegPoint << RobotLegPosition(0, 0), RobotLegPosition(0, 1), RobotLegPosition(0, 2), 1.0;
 
-        Eigen::Vector3d theta = LegIK(LegPoint);
-        std::cout <<  Rad2deg(theta[0]) << "    " <<
-                      Rad2deg(theta[1]) << "    " <<
-                      Rad2deg(theta[2]) << std::endl;
+        // Eigen::Vector3d theta = LegIK(LegPoint);
+        std::cout <<  Rad2deg(MotorRadian[0]) << "    " <<
+                      Rad2deg(MotorRadian[1]) << "    " <<
+                      Rad2deg(MotorRadian[2]) << std::endl;
         
 
 
@@ -197,13 +197,13 @@ void Custom::RobotControl()
         // ControlMotor(FR_0, MotorRadian[3], 0.8f);
         // ControlMotor(FR_1, MotorRadian[4], 0.8f);
         // ControlMotor(FR_2, (float)(-MotorRadian[2]), 0.8f);
-        cmd.motorCmd[FR_2].q = (float)(-theta[2]);
+        cmd.motorCmd[FR_2].q = (float)(-MotorRadian[2]);
         cmd.motorCmd[FR_2].dq = 0.0;
         cmd.motorCmd[FR_2].Kp = 5.0;
         cmd.motorCmd[FR_2].Kd = 1.0;
         cmd.motorCmd[FR_2].tau = 0.8f;
 
-        cmd.motorCmd[FR_1].q = (float)(-theta[1]);
+        cmd.motorCmd[FR_1].q = (float)(-MotorRadian[1]);
         cmd.motorCmd[FR_1].dq = 0.0;
         cmd.motorCmd[FR_1].Kp = 5.0;
         cmd.motorCmd[FR_1].Kd = 1.0;
@@ -225,6 +225,7 @@ void Custom::RobotControl()
     }
 
     udp.SetSend(cmd);
+    usleep(10000);
   }
 
 }

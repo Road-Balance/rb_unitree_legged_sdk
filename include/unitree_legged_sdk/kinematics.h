@@ -31,7 +31,7 @@ double Deg2rad(double angle)
 }
 
 double Rad2deg(double rad)
-{
+{       
     double angle = rad * 180 / pi;
 
     return angle;
