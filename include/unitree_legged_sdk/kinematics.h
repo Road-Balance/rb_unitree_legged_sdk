@@ -238,10 +238,10 @@ Eigen::VectorXd CalcIK(Eigen::Matrix4d RobotLp, Eigen::Vector3d angles, Eigen::V
 
 void ControlMotor(  const int target_leg, 
                     const float q_, 
-                    const float tau_, 
                     const float dq_ = 1.0, 
                     const float Kp_ = 5.0, 
-                    const float Kd_ = 1.0 )
+                    const float Kd_ = 1.0,
+                    const float tau_ = 0.8f) 
 {
     cmd.motorCmd[target_leg].q = q_;
     cmd.motorCmd[target_leg].dq = dq_;
