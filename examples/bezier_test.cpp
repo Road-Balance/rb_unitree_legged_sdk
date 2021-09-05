@@ -172,7 +172,7 @@ void Custom::RobotControl()
         //                     -100, -100, 100, 1,
         //                     -100, -100, -100, 1;
         
-        MotorRadian = CalcIK(RobotLegPosition, rotation, center);
+        MotorRadian = CalcIK(center, rotation, RobotLegPosition);
         
 
         std::cout <<  Rad2deg(MotorRadian[0]) << "    " <<
