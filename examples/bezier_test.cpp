@@ -48,6 +48,7 @@ public:
   
   bool PreparePose = false;
   bool BezierCurve = false;
+  bool StanceMode = false; // false : SwingMode
 
 };
 
@@ -135,6 +136,7 @@ void Custom::RobotControl()
         
         if (currtime < StanceTime)
         {
+          StanceMode = true; // StanceMode
           double StanceRatio = currtime / StanceTime;
           FeetPosition = CalculateBezierStance(StanceRatio, V, angle);
           // x.push_back(FeetPosition[0]);
@@ -147,6 +149,7 @@ void Custom::RobotControl()
         }
         else
         {
+          StanceMode = false; // SwingMode
           double SwingRatio = (currtime - StanceTime) / (1.0 - StanceTime);
           FeetPosition = CalculateBezierSwing(SwingRatio, V, angle);
           // x.push_back(FeetPosition[0]);
@@ -171,43 +174,28 @@ void Custom::RobotControl()
         
         MotorRadian = CalcIK(RobotLegPosition, rotation, center);
         
-        // Eigen::Vector4d LegPoint;
-        // LegPoint << RobotLegPosition(0, 0), RobotLegPosition(0, 1), RobotLegPosition(0, 2), 1.0;
 
-        // Eigen::Vector3d theta = LegIK(LegPoint);
         std::cout <<  Rad2deg(MotorRadian[0]) << "    " <<
                       Rad2deg(MotorRadian[1]) << "    " <<
                       Rad2deg(MotorRadian[2]) << std::endl;
         
 
+        if(StanceMode)
+        {
+          // ControlMotor(FR_0, MotorRadian[3], 0.8f);
+          ControlMotor(FR_1, (float)(-MotorRadian[1]), 3.0f);
+          ControlMotor(FR_2, (float)(-MotorRadian[2]), 3.0f);          
+        }
+        else  // Swing
+        {
+          // ControlMotor(FR_0, MotorRadian[3], 0.8f);
+          ControlMotor(FR_1, (float)(-MotorRadian[1]), 0.0f);
+          ControlMotor(FR_2, (float)(-MotorRadian[2]), 0.0f);  
+        }
 
-        // for(int i = 0; i < MotorRadian.size(); i++)
-        // {
-        //   MotorDeg[i] = Rad2deg(MotorRadian[i]);
-        // }
         
-        // std::cout << MotorDeg[0] << "        " <<
-        // MotorDeg[1] << "        " <<
-        // MotorDeg[2] << std::endl;  
-        
-        // std::vector<double> MotorRad;
-        // MotorRad = EigenXdTovec(MotorRadian);
 
-        
-        // ControlMotor(FR_0, MotorRadian[3], 0.8f);
-        // ControlMotor(FR_1, MotorRadian[4], 0.8f);
-        // ControlMotor(FR_2, (float)(-MotorRadian[2]), 0.8f);
-        cmd.motorCmd[FR_2].q = (float)(-MotorRadian[2]);
-        cmd.motorCmd[FR_2].dq = 0.0;
-        cmd.motorCmd[FR_2].Kp = 5.0;
-        cmd.motorCmd[FR_2].Kd = 1.0;
-        cmd.motorCmd[FR_2].tau = 0.8f;
 
-        cmd.motorCmd[FR_1].q = (float)(-MotorRadian[1]);
-        cmd.motorCmd[FR_1].dq = 0.0;
-        cmd.motorCmd[FR_1].Kp = 5.0;
-        cmd.motorCmd[FR_1].Kd = 1.0;
-        cmd.motorCmd[FR_1].tau = 0.8f;
       
 
         // DrawScatterPlot(imageReference, 1000, 300, &x, &z);
