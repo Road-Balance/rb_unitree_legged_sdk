@@ -25,6 +25,10 @@ add_executable(bezier_test examples/bezier_test.cpp
 include/unitree_legged_sdk/pbPlots.cpp include/unitree_legged_sdk/supportLib.cpp)
 target_link_libraries(bezier_test ${EXTRA_LIBS})
 
+add_executable(Kinematics_test examples/Kinematics_test.cpp
+include/unitree_legged_sdk/pbPlots.cpp include/unitree_legged_sdk/supportLib.cpp)
+target_link_libraries(Kinematics_test ${EXTRA_LIBS})
+
 add_executable(example_velocity examples/example_velocity.cpp)
 target_link_libraries(example_velocity ${EXTRA_LIBS})
 
@@ -33,6 +37,8 @@ target_link_libraries(example_torque ${EXTRA_LIBS})
 
 add_executable(example_walk examples/example_walk.cpp)
 target_link_libraries(example_walk ${EXTRA_LIBS})
+
+
 
 # add_executable(example_wirelessHandle examples/example_wirelessHandle.cpp)
 # target_link_libraries(example_wirelessHandle ${EXTRA_LIBS})

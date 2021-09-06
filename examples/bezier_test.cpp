@@ -45,6 +45,7 @@ public:
   Eigen::Vector3d rotation = {0, 0, 0};
   Eigen::Vector3d center = {0, 0, 0};
   std::vector<double> x, y, z;
+  std::vector<Eigen::Matrix4d> TransRobotCenter2UpShoulder = TransRobotCenter2UpShoulder_();
   
   bool PreparePose = false;
   bool BezierCurve = false;
@@ -130,47 +131,42 @@ void Custom::RobotControl()
         double currtime = jointLinearInterpolation(0.0, 1.0, rate);
         if(rate == 1 ) bezier_rate_count = 0;
 
-        Eigen::Vector3d FeetPosition;
+        Eigen::Vector4d BezierPositon_UpShoulder;
         Eigen::VectorXd MotorRadian(12);
         Eigen::VectorXd MotorDeg(12);
         
+
         if (currtime < StanceTime)
         {
           StanceMode = true; // StanceMode
           double StanceRatio = currtime / StanceTime;
-          FeetPosition = CalculateBezierStance(StanceRatio, V, angle);
-          // x.push_back(FeetPosition[0]);
-          // y.push_back(FeetPosition[1]);
-          // z.push_back(FeetPosition[2]);
+          BezierPositon_UpShoulder = CalculateBezierStance(StanceRatio, V, angle);
+
           std::cout << " Stance !!   " << " stanceratio : " << StanceRatio << "    ";
-          std::cout << " X : " << FeetPosition[0]
-                    << " Y : " << FeetPosition[1] 
-                    << " Z : " << FeetPosition[2] << std::endl;
+          std::cout << " X : " << BezierPositon_UpShoulder[0]
+                    << " Y : " << BezierPositon_UpShoulder[1] 
+                    << " Z : " << BezierPositon_UpShoulder[2] << std::endl;
         }
         else
         {
           StanceMode = false; // SwingMode
           double SwingRatio = (currtime - StanceTime) / (1.0 - StanceTime);
-          FeetPosition = CalculateBezierSwing(SwingRatio, V, angle);
-          // x.push_back(FeetPosition[0]);
-          // y.push_back(FeetPosition[1]);
-          // z.push_back(FeetPosition[2]);
+          BezierPositon_UpShoulder = CalculateBezierSwing(SwingRatio, V, angle);
+
           std::cout << std::endl;
           std::cout << " Swing !!   " << " swingratio : " << SwingRatio << "    ";
-          std::cout << " X : " << FeetPosition[0] 
-                    << " Y : " << FeetPosition[1] 
-                    << " Z : " << FeetPosition[2] << std::endl;
+          std::cout << " X : " << BezierPositon_UpShoulder[0] 
+                    << " Y : " << BezierPositon_UpShoulder[1] 
+                    << " Z : " << BezierPositon_UpShoulder[2] << std::endl;
         }
 
+        
+        
         Eigen::Matrix4d RobotLegPosition;
-        RobotLegPosition << 0.1805 + FeetPosition[0], -0.047 + FeetPosition[1], -0.33 + FeetPosition[2], 1,
-                            0.1805 + FeetPosition[0], 0.047 + FeetPosition[1], -0.33 + FeetPosition[2], 1,
-                            -0.1, -0.1, 0.1, 1,
-                            -0.1805 + FeetPosition[0],  -0.047 + FeetPosition[1], -0.33 + FeetPosition[2], 1;
-        // RobotLegPosition << 100, -100, 100, 1,
-        //                     100, -100, -100, 1,
-        //                     -100, -100, 100, 1,
-        //                     -100, -100, -100, 1;
+        RobotLegPosition << (BezierPositon_UpShoulder * TransRobotCenter2UpShoulder[0]).transpose(),
+                            (BezierPositon_UpShoulder * TransRobotCenter2UpShoulder[1]).transpose(),                           
+                            (BezierPositon_UpShoulder * TransRobotCenter2UpShoulder[2]).transpose(),                            
+                            (BezierPositon_UpShoulder * TransRobotCenter2UpShoulder[3]).transpose();
         
         MotorRadian = CalcIK(center, rotation, RobotLegPosition);
         
