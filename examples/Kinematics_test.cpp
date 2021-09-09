@@ -10,8 +10,8 @@ int main()
     Eigen::Vector3d center = {0, 0, 0};
     Eigen::Matrix4d RobotLegPosition;
     Eigen::VectorXd MotorRadian(12);
-    double L(0.3610), W(0.094);
-    double l1(0.0838), l2(0.2), l3(0.2);
+    // double L(0.3610), W(0.094);
+    // double l1(0.0838), l2(0.2), l3(0.2);
 
     double k = W/2 + l1;
 

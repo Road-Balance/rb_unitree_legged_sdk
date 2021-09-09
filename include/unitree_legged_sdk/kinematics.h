@@ -11,15 +11,28 @@
 // #include "supportLib.hpp"
 
 const double pi = M_PI; 
-// Eigen::Matrix4d Iden4d = Eigen::Matrix<double, 4, 4>::Identity();
-// UNITREE_LEGGED_SDK::LowCmd cmd;
 double L(0.3610), W(0.094);
-Eigen::Matrix4d TransRobotCenter2UpShoulder_1 = Eigen::Matrix4d::Ones();
-TransRobotCenter2UpShoulder_1 << 1, 0, 0, -W/2,    0, 1, 0, 0,     0, 0, 1, -L/2,     0, 0, 0, 1;
-// Eigen::Matrix4d TransRobotCenter2UpShoulder_2; 
-// TransRobotCenter2UpShoulder_2 << 1, 0, 0, W/2,    0, 1, 0, 0,     0, 0, 1, -L/2,     0, 0, 0, 1;
-// Eigen::Matrix4d TransRobotCenter2UpShoulder_3 << 1, 0, 0, -W/2,    0, 1, 0, 0,     0, 0, 1, L/2,      0, 0, 0, 1;
-// Eigen::Matrix4d TransRobotCenter2UpShoulder_4 << 1, 0, 0, W/2,    0, 1, 0, 0,     0, 0, 1, L/2,      0, 0, 0, 1;
+double l1(0.0838), l2(0.2), l3(0.2);
+
+Eigen::Matrix4d TransRobotCenter2UpShoulder_1 = (Eigen::Matrix4d() <<   1, 0, 0, -W/2,    
+                                                                        0, 1, 0, 0,     
+                                                                        0, 0, 1, -L/2,     
+                                                                        0, 0, 0, 1).finished();
+
+Eigen::Matrix4d TransRobotCenter2UpShoulder_2 = (Eigen::Matrix4d() <<   1, 0, 0, W/2,    
+                                                                        0, 1, 0, 0,     
+                                                                        0, 0, 1, -L/2,     
+                                                                        0, 0, 0, 1).finished(); 
+
+Eigen::Matrix4d TransRobotCenter2UpShoulder_3  = (Eigen::Matrix4d() <<  1, 0, 0, -W/2,    
+                                                                        0, 1, 0, 0,     
+                                                                        0, 0, 1, L/2,      
+                                                                        0, 0, 0, 1).finished();
+
+Eigen::Matrix4d TransRobotCenter2UpShoulder_4 = (Eigen::Matrix4d() <<   1, 0, 0, W/2,    
+                                                                        0, 1, 0, 0,     
+                                                                        0, 0, 1, L/2,      
+                                                                        0, 0, 0, 1).finished();
 
 std::vector<double> createDomain(const double start, const double end, const double step)
 {
@@ -233,7 +246,7 @@ Eigen::Matrix4d TransWorld2RobotCenter(Eigen::Vector3d Center, Eigen::Vector3d R
 
 Eigen::Vector3d LegIK(Eigen::Vector4d Lp)
 {
-    double l1(0.0838), l2(0.2), l3(0.2); // 50 20 100 100
+    
     double D, F, G, H;
     double x(Lp[0]), y(Lp[1]), z(Lp[2]);
     Eigen::Vector3d theta;
@@ -270,25 +283,27 @@ Eigen::VectorXd CalcIK(Eigen::Vector3d Center, Eigen::Vector3d Rotation, Eigen::
             0, 0, 1, 0,
             0, 0, 0, 1;
     Eigen::VectorXd motorRadian(12);
-
-    std::vector<Eigen::Matrix4d> trans = TransRobotCenter2UpShoulder_();
+    Eigen::Vector3d theta1, theta2, theta3, theta4; 
     
-    Eigen::Matrix4d Tlf(trans[0]), Trf(trans[1]), Tlb(trans[2]), Trb(trans[3]);
     
 
 
-    Eigen::Vector4d Lp_UpShoulder1(Iden4d * trans[0] * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(0)), 
-                    Lp_UpShoulder2(trans[1] * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(1)),
-                    Lp_UpShoulder3(Iden4d * trans[2] * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(2)),
-                    Lp_UpShoulder4(trans[3] * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(3));
+    Eigen::Vector4d Lp_UpShoulder1(Iden4d * TransRobotCenter2UpShoulder_1 * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(0)), 
+                    Lp_UpShoulder2(TransRobotCenter2UpShoulder_2 * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(1)),
+                    Lp_UpShoulder3(Iden4d * TransRobotCenter2UpShoulder_3 * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(2)),
+                    Lp_UpShoulder4(TransRobotCenter2UpShoulder_4 * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(3));
     
+    theta1 = LegIK(Lp_UpShoulder1);
+    theta2 = LegIK(Lp_UpShoulder2);
+    theta3 = LegIK(Lp_UpShoulder3);
+    theta4 = LegIK(Lp_UpShoulder4);
+    
+    
+    motorRadian <<      theta1[0], theta1[1], theta1[2],
+                        theta2[0], theta2[1], theta2[2],
+                        theta3[0], theta3[1], theta3[2],
+                        theta4[0], theta4[1], theta4[2];
 
-    
-    
-    motorRadian <<      LegIK(Lp_UpShoulder1)[0], LegIK(Lp_UpShoulder1)[1], LegIK(Lp_UpShoulder1)[2],
-                        LegIK(Lp_UpShoulder2)[0], LegIK(Lp_UpShoulder2)[1], LegIK(Lp_UpShoulder2)[2],
-                        LegIK(Lp_UpShoulder3)[0], LegIK(Lp_UpShoulder3)[1], LegIK(Lp_UpShoulder3)[2],
-                        LegIK(Lp_UpShoulder4)[0], LegIK(Lp_UpShoulder4)[1], LegIK(Lp_UpShoulder4)[2];
 
 
     return motorRadian;

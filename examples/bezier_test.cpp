@@ -45,7 +45,6 @@ public:
   Eigen::Vector3d rotation = {0, 0, 0};
   Eigen::Vector3d center = {0, 0, 0};
   std::vector<double> x, y, z;
-  std::vector<Eigen::Matrix4d> TransRobotCenter2UpShoulder = TransRobotCenter2UpShoulder_();
   
   bool PreparePose = false;
   bool BezierCurve = false;
@@ -163,10 +162,10 @@ void Custom::RobotControl()
         
         
         Eigen::Matrix4d RobotLegPosition;
-        RobotLegPosition << (BezierPositon_UpShoulder * TransRobotCenter2UpShoulder[0]).transpose(),
-                            (BezierPositon_UpShoulder * TransRobotCenter2UpShoulder[1]).transpose(),                           
-                            (BezierPositon_UpShoulder * TransRobotCenter2UpShoulder[2]).transpose(),                            
-                            (BezierPositon_UpShoulder * TransRobotCenter2UpShoulder[3]).transpose();
+        RobotLegPosition << (TransRobotCenter2UpShoulder_1 * BezierPositon_UpShoulder).transpose(),
+                            (TransRobotCenter2UpShoulder_2 * BezierPositon_UpShoulder).transpose(),                           
+                            (TransRobotCenter2UpShoulder_3 * BezierPositon_UpShoulder).transpose(),                            
+                            (TransRobotCenter2UpShoulder_4 * BezierPositon_UpShoulder).transpose();
         
         MotorRadian = CalcIK(center, rotation, RobotLegPosition);
         
