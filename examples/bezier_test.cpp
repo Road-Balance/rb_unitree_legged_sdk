@@ -162,31 +162,31 @@ void Custom::RobotControl()
         
         
         Eigen::Matrix4d RobotLegPosition;
-        RobotLegPosition << (TransUpShoulder2RobotCenter_1 * BezierPositon_UpShoulder).transpose(),
-                            (TransUpShoulder2RobotCenter_2 * BezierPositon_UpShoulder).transpose(),                           
-                            (TransUpShoulder2RobotCenter_3 * BezierPositon_UpShoulder).transpose(),                            
-                            (TransUpShoulder2RobotCenter_4 * BezierPositon_UpShoulder).transpose();
+        RobotLegPosition << (TransDownShoulder2RobotCenter1 * BezierPositon_UpShoulder),
+                            (TransDownShoulder2RobotCenter2 * BezierPositon_UpShoulder),                           
+                            (TransDownShoulder2RobotCenter3 * BezierPositon_UpShoulder),                            
+                            (TransDownShoulder2RobotCenter4 * BezierPositon_UpShoulder);
         
         MotorRadian = CalcIK(center, rotation, RobotLegPosition);
-        
+        std::cout << RobotLegPosition << std:: endl;
 
         std::cout <<  Rad2deg(MotorRadian[0]) << "    " <<
                       Rad2deg(MotorRadian[1]) << "    " <<
-                      Rad2deg(MotorRadian[2]) << "    " <<
-                      Rad2deg(MotorRadian[9]) << "    " <<
-                      Rad2deg(MotorRadian[10]) << "    " <<
-                      Rad2deg(MotorRadian[11]) << std::endl;
+                      Rad2deg(MotorRadian[2]) << "    " <<std::endl;
+                      // Rad2deg(MotorRadian[9]) << "    " <<
+                      // Rad2deg(MotorRadian[10]) << "    " <<
+                      // Rad2deg(MotorRadian[11]) << std::endl;
         
 
         if(StanceMode)
         {
-          ControlMotor(cmd, FR_0, 0.0);
-          ControlMotor(cmd, FR_1, (float)(-MotorRadian[1]), 3.0f);
-          ControlMotor(cmd, FR_2, (float)(-MotorRadian[2]), 3.0f);
-
           ControlMotor(cmd, FL_0, 0.0);
-          ControlMotor(cmd, FL_1, (float)(-MotorRadian[4]), 3.0f);
-          ControlMotor(cmd, FL_2, (float)(-MotorRadian[5]), 3.0f);
+          ControlMotor(cmd, FL_1, (float)(-MotorRadian[1]), 3.0f);
+          ControlMotor(cmd, FL_2, (float)(-MotorRadian[2]), 3.0f);
+
+          // ControlMotor(cmd, FL_0, 0.0);
+          // ControlMotor(cmd, FL_1, (float)(-MotorRadian[4]), 3.0f);
+          // ControlMotor(cmd, FL_2, (float)(-MotorRadian[5]), 3.0f);
   
           // ControlMotor(cmd, RR_0, 0.0);
           // ControlMotor(cmd, RR_1, (float)(-MotorRadian[10]), 3.0f);
@@ -195,13 +195,13 @@ void Custom::RobotControl()
         }
         else  // Swing
         {
-          ControlMotor(cmd, FR_0, 0.0);
-          ControlMotor(cmd, FR_1, (float)(-MotorRadian[1]));
-          ControlMotor(cmd, FR_2, (float)(-MotorRadian[2]));
-
           ControlMotor(cmd, FL_0, 0.0);
-          ControlMotor(cmd, FL_1, (float)(-MotorRadian[4]));
-          ControlMotor(cmd, FL_2, (float)(-MotorRadian[5]));
+          ControlMotor(cmd, FL_1, (float)(-MotorRadian[1]));
+          ControlMotor(cmd, FL_2, (float)(-MotorRadian[2]));
+
+          // ControlMotor(cmd, FL_0, 0.0);
+          // ControlMotor(cmd, FL_1, (float)(-MotorRadian[4]));
+          // ControlMotor(cmd, FL_2, (float)(-MotorRadian[5]));
           
           // ControlMotor(cmd, RR_0, 0.0);
           // ControlMotor(cmd, RR_1, (float)(-MotorRadian[10]));

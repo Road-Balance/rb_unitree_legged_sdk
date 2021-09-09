@@ -34,22 +34,22 @@ Eigen::Matrix4d TransRobotCenter2UpShoulder_4 = (Eigen::Matrix4d() <<   1, 0, 0,
                                                                         0, 0, 1, L/2,      
                                                                         0, 0, 0, 1).finished();
 
-Eigen::Matrix4d TransUpShoulder2RobotCenter_1 = (Eigen::Matrix4d() <<   1, 0, 0, W/2,    
+Eigen::Matrix4d TransDownShoulder2RobotCenter1 = (Eigen::Matrix4d() <<   1, 0, 0, W/2 + l1,    
                                                                         0, 1, 0, 0,     
                                                                         0, 0, 1, L/2,     
                                                                         0, 0, 0, 1).finished();
 
-Eigen::Matrix4d TransUpShoulder2RobotCenter_2 = (Eigen::Matrix4d() <<   1, 0, 0, -W/2,    
+Eigen::Matrix4d TransDownShoulder2RobotCenter2 = (Eigen::Matrix4d() <<   1, 0, 0, -W/2 - l1,    
                                                                         0, 1, 0, 0,     
                                                                         0, 0, 1, L/2,     
                                                                         0, 0, 0, 1).finished(); 
 
-Eigen::Matrix4d TransUpShoulder2RobotCenter_3  = (Eigen::Matrix4d() <<  1, 0, 0, W/2,    
+Eigen::Matrix4d TransDownShoulder2RobotCenter3  = (Eigen::Matrix4d() <<  1, 0, 0, W/2 + l1,    
                                                                         0, 1, 0, 0,     
                                                                         0, 0, 1, -L/2,      
                                                                         0, 0, 0, 1).finished();
 
-Eigen::Matrix4d TransUpShoulder2RobotCenter_4 = (Eigen::Matrix4d() <<   1, 0, 0, -W/2,    
+Eigen::Matrix4d TransDownShoulder2RobotCenter4 = (Eigen::Matrix4d() <<   1, 0, 0, -W/2 - l1,    
                                                                         0, 1, 0, 0,     
                                                                         0, 0, 1, -L/2,      
                                                                         0, 0, 0, 1).finished();
@@ -129,7 +129,7 @@ Eigen::Vector4d CalculateBezierStance(double phi_st, double V, double angle)
     //                                - A * cos(pi / (2 * halfStance) * p_Stance)); // stanceZ
 
     Eigen::Vector4d StancePosition(- A * cos(pi / (2 * halfStance) * p_Stance),                       // stanceX                  
-                                   - s * p_Stance * fabs(V),                     // stanceY                       
+                                   - s * p_Stance * fabs(V) -0.28,                     // stanceY                       
                                    c * p_Stance * fabs(V),
                                    1);
     // std::cout <<  p_Stance << std::endl;
@@ -166,7 +166,7 @@ Eigen::Vector4d CalculateBezierSwing(double phi_sw, double V, double angle)
     {
         SwingPositon[2] += BezierCurve(phi_sw, i, X[i]); // swingX
         SwingPositon[0] += BezierCurve(phi_sw, i, Y[i]); // swingY
-        SwingPositon[1] += BezierCurve(phi_sw, i, Z[i]); // swingZ
+        SwingPositon[1] = SwingPositon[1] + BezierCurve(phi_sw, i, Z[i]) - 0.28; // swingZ
         SwingPositon[3] = 1.0;
     }
 
