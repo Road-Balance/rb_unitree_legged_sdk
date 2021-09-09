@@ -34,6 +34,26 @@ Eigen::Matrix4d TransRobotCenter2UpShoulder_4 = (Eigen::Matrix4d() <<   1, 0, 0,
                                                                         0, 0, 1, L/2,      
                                                                         0, 0, 0, 1).finished();
 
+Eigen::Matrix4d TransUpShoulder2RobotCenter_1 = (Eigen::Matrix4d() <<   1, 0, 0, W/2,    
+                                                                        0, 1, 0, 0,     
+                                                                        0, 0, 1, L/2,     
+                                                                        0, 0, 0, 1).finished();
+
+Eigen::Matrix4d TransUpShoulder2RobotCenter_2 = (Eigen::Matrix4d() <<   1, 0, 0, -W/2,    
+                                                                        0, 1, 0, 0,     
+                                                                        0, 0, 1, L/2,     
+                                                                        0, 0, 0, 1).finished(); 
+
+Eigen::Matrix4d TransUpShoulder2RobotCenter_3  = (Eigen::Matrix4d() <<  1, 0, 0, W/2,    
+                                                                        0, 1, 0, 0,     
+                                                                        0, 0, 1, -L/2,      
+                                                                        0, 0, 0, 1).finished();
+
+Eigen::Matrix4d TransUpShoulder2RobotCenter_4 = (Eigen::Matrix4d() <<   1, 0, 0, -W/2,    
+                                                                        0, 1, 0, 0,     
+                                                                        0, 0, 1, -L/2,      
+                                                                        0, 0, 0, 1).finished();
+
 std::vector<double> createDomain(const double start, const double end, const double step)
 {
     std::vector<double> domain;
@@ -244,36 +264,85 @@ Eigen::Matrix4d TransWorld2RobotCenter(Eigen::Vector3d Center, Eigen::Vector3d R
 //     return Trans;
 // }
 
-Eigen::Vector3d LegIK(Eigen::Vector4d Lp)
-{
-    
-    double D, F, G, H;
-    double x(Lp[0]), y(Lp[1]), z(Lp[2]);
-    Eigen::Vector3d theta;
-    
-    if(pow(x, 2) + pow(y, 2) - pow(l1,2) < 0) //
-        F = l1;
-    else
-        F=sqrt(pow(x, 2) + pow(y, 2) - pow(l1,2));//
+//FK
 
-
-    G = F;
-    H = sqrt(pow(G, 2) + pow(z, 2));
-
-    theta[0] = atan2(y, x) + atan2(F, -l1);//
-
-    D=(pow(H, 2) - pow(l2, 2) - pow(l3, 2))/(2 * l2 * l3);
-    if(-1 < D || D < 1)
-        theta[2] = acos(D);
-    else
-        theta[2] = 0;
-
-    
-    theta[1] = atan2(-z,G) - atan2(l3 * sin(theta[2]), l2 + l3 * cos(theta[2]));
-    // std::cout << "legik result : " << theta << std::endl;
-    return theta;
-
+Eigen::Vector4d legFK(Eigen::Vector3d jointAngle, const int legParity){
+	//jointAngle : (q1, q2, q3)
+	//legParity : -1 if left, 1 if right
+	
+	Eigen::Matrix4d H1, H2, H3;
+	H1 << cos(jointAngle[0]), -sin(jointAngle[0]), 0, -l1*legParity*cos(jointAngle[0]),
+	      sin(jointAngle[0]), cos(jointAngle[0]),  0, -l1*legParity*sin(jointAngle[0]),
+	      0, 0, 1, 0,
+	      0, 0, 0, 1;
+	H2 << 1, 0, 0, 0,
+	      0, cos(jointAngle[1]), -sin(jointAngle[1]), -l2*cos(jointAngle[1]),
+	      0, sin(jointAngle[1]), cos(jointAngle[1]), -l2*sin(jointAngle[1]),
+	      0, 0, 0, 1;
+	H3 << 1, 0, 0, 0,
+	      0, cos(jointAngle[2]), -sin(jointAngle[2]), -l3*cos(jointAngle[2]),
+	      0, sin(jointAngle[2]), cos(jointAngle[2]), -l3*sin(jointAngle[2]),
+	      0, 0, 0, 1; 
+	Eigen::Vector4d id(0,0,0,1);
+	return H1*H2*H3*id;
 }
+
+
+//IK
+
+Eigen::Vector3d legIK(Eigen::Vector4d legPosition, const int legParity, const int q3Parity){
+	//legPosition : position of the end-effector with respect to each hip joint
+	//legParity : -1 if left, 1 if right
+	//q3Parity : decides L3 configuration
+	
+	double R1, R2, R3;
+	double x(legPosition[0]), y(legPosition[1]), z(legPosition[2]);
+
+	Eigen::Vector3d IKResult;	//IKResult : (q1, q2, q3)
+	
+	R1 = sqrt(pow(x, 2) + pow(y, 2) - pow(l1, 2));		//R1 : y2 distance from hip joint to end-effector
+	R2 = sqrt(pow(R1, 2) + pow(z, 2)); 			//R2 : distance from hip joint to end-effector
+	R3 = (pow(R2, 2)-pow(l2, 2)-pow(l3, 2))/(2*l2*l3);
+
+	if(R3 > 1 || R3 < -1) (R3 > 0)?(R3 = 1):(R3 = -1);
+	IKResult[2] = q3Parity*acos(R3);						// q3
+	IKResult[1] = atan2(-z, R1)-atan2(l3*sin(IKResult[2]),l2+l3*cos(IKResult[2]));	// q2
+	IKResult[0] = atan2(y, x)+atan2(R1, -l1*legParity);				// q1
+	
+	return IKResult; 
+}
+
+
+// Eigen::Vector3d LegIK(Eigen::Vector4d Lp)
+// {
+    
+//     double D, F, G, H;
+//     double x(Lp[0]), y(Lp[1]), z(Lp[2]);
+//     Eigen::Vector3d theta;
+    
+//     if(pow(x, 2) + pow(y, 2) - pow(l1,2) < 0) //
+//         F = l1;
+//     else
+//         F=sqrt(pow(x, 2) + pow(y, 2) - pow(l1,2));//
+
+
+//     G = F;
+//     H = sqrt(pow(G, 2) + pow(z, 2));
+
+//     theta[0] = atan2(y, x) + atan2(F, -l1);//
+
+//     D=(pow(H, 2) - pow(l2, 2) - pow(l3, 2))/(2 * l2 * l3);
+//     if(-1 < D || D < 1)
+//         theta[2] = acos(D);
+//     else
+//         theta[2] = 0;
+
+    
+//     theta[1] = atan2(-z,G) - atan2(l3 * sin(theta[2]), l2 + l3 * cos(theta[2]));
+//     // std::cout << "legik result : " << theta << std::endl;
+//     return theta;
+
+// }
 
 Eigen::VectorXd CalcIK(Eigen::Vector3d Center, Eigen::Vector3d Rotation, Eigen::Matrix4d LegPositon)
 {
@@ -288,15 +357,15 @@ Eigen::VectorXd CalcIK(Eigen::Vector3d Center, Eigen::Vector3d Rotation, Eigen::
     
 
 
-    Eigen::Vector4d Lp_UpShoulder1(Iden4d * TransRobotCenter2UpShoulder_1 * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(0)), 
+    Eigen::Vector4d Lp_UpShoulder1(TransRobotCenter2UpShoulder_1 * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(0)), 
                     Lp_UpShoulder2(TransRobotCenter2UpShoulder_2 * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(1)),
-                    Lp_UpShoulder3(Iden4d * TransRobotCenter2UpShoulder_3 * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(2)),
+                    Lp_UpShoulder3(TransRobotCenter2UpShoulder_3 * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(2)),
                     Lp_UpShoulder4(TransRobotCenter2UpShoulder_4 * TransWorld2RobotCenter(Center, Rotation) * LegPositon.col(3));
     
-    theta1 = LegIK(Lp_UpShoulder1);
-    theta2 = LegIK(Lp_UpShoulder2);
-    theta3 = LegIK(Lp_UpShoulder3);
-    theta4 = LegIK(Lp_UpShoulder4);
+    theta1 = legIK(Lp_UpShoulder1, -1, 1);
+    theta2 = legIK(Lp_UpShoulder2, 1, 1);
+    theta3 = legIK(Lp_UpShoulder3, -1, 1);
+    theta4 = legIK(Lp_UpShoulder4, 1, 1 );
     
     
     motorRadian <<      theta1[0], theta1[1], theta1[2],

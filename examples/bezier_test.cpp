@@ -162,10 +162,10 @@ void Custom::RobotControl()
         
         
         Eigen::Matrix4d RobotLegPosition;
-        RobotLegPosition << (TransRobotCenter2UpShoulder_1 * BezierPositon_UpShoulder).transpose(),
-                            (TransRobotCenter2UpShoulder_2 * BezierPositon_UpShoulder).transpose(),                           
-                            (TransRobotCenter2UpShoulder_3 * BezierPositon_UpShoulder).transpose(),                            
-                            (TransRobotCenter2UpShoulder_4 * BezierPositon_UpShoulder).transpose();
+        RobotLegPosition << (TransUpShoulder2RobotCenter_1 * BezierPositon_UpShoulder).transpose(),
+                            (TransUpShoulder2RobotCenter_2 * BezierPositon_UpShoulder).transpose(),                           
+                            (TransUpShoulder2RobotCenter_3 * BezierPositon_UpShoulder).transpose(),                            
+                            (TransUpShoulder2RobotCenter_4 * BezierPositon_UpShoulder).transpose();
         
         MotorRadian = CalcIK(center, rotation, RobotLegPosition);
         
