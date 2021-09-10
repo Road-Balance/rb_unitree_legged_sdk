@@ -11,7 +11,7 @@
 // #include "supportLib.hpp"
 
 const double pi = M_PI; 
-double L(0.3610), W(0.094);
+double L(0.3610), W(0.094), height(0.28);
 double l1(0.0838), l2(0.2), l3(0.2);
 
 Eigen::Matrix4d TransRobotCenter2UpShoulder_1 = (Eigen::Matrix4d() <<   1, 0, 0, -W/2,    
@@ -129,7 +129,7 @@ Eigen::Vector4d CalculateBezierStance(double phi_st, double V, double angle)
     //                                - A * cos(pi / (2 * halfStance) * p_Stance)); // stanceZ
 
     Eigen::Vector4d StancePosition(- A * cos(pi / (2 * halfStance) * p_Stance),                       // stanceX                  
-                                   - s * p_Stance * fabs(V) -0.28,                     // stanceY                       
+                                   - s * p_Stance * fabs(V) - height,                     // stanceY                       
                                    c * p_Stance * fabs(V),
                                    1);
     // std::cout <<  p_Stance << std::endl;
@@ -166,9 +166,11 @@ Eigen::Vector4d CalculateBezierSwing(double phi_sw, double V, double angle)
     {
         SwingPositon[2] += BezierCurve(phi_sw, i, X[i]); // swingX
         SwingPositon[0] += BezierCurve(phi_sw, i, Y[i]); // swingY
-        SwingPositon[1] = SwingPositon[1] + BezierCurve(phi_sw, i, Z[i]) - 0.28; // swingZ
+        SwingPositon[1] += BezierCurve(phi_sw, i, Z[i]); // swingZ
         SwingPositon[3] = 1.0;
     }
+
+    SwingPositon[1] -= height;
 
     return SwingPositon;
 }
@@ -224,45 +226,7 @@ Eigen::Matrix4d TransWorld2RobotCenter(Eigen::Vector3d Center, Eigen::Vector3d R
 
 }
 
-// std::vector<Eigen::Matrix4d> TransRobotCenter2UpShoulder()
-// {
-//     double L(0.3610), W(0.094);// 240 80
-//     Eigen::Matrix4d Tlf, Trf, Tlb, Trb;
-//     std::vector<Eigen::Matrix4d> Trans(4);
-    
-//     Tlf << 1, 0, 0, -W/2,    0, 1, 0, 0,     0, 0, 1, -L/2,     0, 0, 0, 1;
-//     Trf << 1, 0, 0, W/2,    0, 1, 0, 0,     0, 0, 1, -L/2,     0, 0, 0, 1;
-//     Tlb << 1, 0, 0, -W/2,    0, 1, 0, 0,     0, 0, 1, L/2,      0, 0, 0, 1;
-//     Trb << 1, 0, 0, W/2,    0, 1, 0, 0,     0, 0, 1, L/2,      0, 0, 0, 1;
-    
-//     Trans[0] = Tlf;
-//     Trans[1] = Trf;
-//     Trans[2] = Tlb;
-//     Trans[3] = Trb;
-    
 
-//     return Trans;
-// }
-
-// std::vector<Eigen::Matrix4d> TransUpShoulder2RobotCenter_()
-// {
-//     double L(0.3610), W(0.094);// 240 80
-//     Eigen::Matrix4d Tlf, Trf, Tlb, Trb;
-//     std::vector<Eigen::Matrix4d> Trans(4);
-    
-//     Tlf << 1, 0, 0, W/2,    0, 1, 0, 0,     0, 0, 1, L/2,     0, 0, 0, 1;
-//     Trf << 1, 0, 0, -W/2,    0, 1, 0, 0,     0, 0, 1, L/2,     0, 0, 0, 1;
-//     Tlb << 1, 0, 0, W/2,    0, 1, 0, 0,     0, 0, 1, -L/2,      0, 0, 0, 1;
-//     Trb << 1, 0, 0, -W/2,    0, 1, 0, 0,     0, 0, 1, -L/2,      0, 0, 0, 1;
-    
-//     Trans[0] = Tlf;
-//     Trans[1] = Trf;
-//     Trans[2] = Tlb;
-//     Trans[3] = Trb;
-    
-
-//     return Trans;
-// }
 
 //FK
 
@@ -313,36 +277,6 @@ Eigen::Vector3d legIK(Eigen::Vector4d legPosition, const int legParity, const in
 }
 
 
-// Eigen::Vector3d LegIK(Eigen::Vector4d Lp)
-// {
-    
-//     double D, F, G, H;
-//     double x(Lp[0]), y(Lp[1]), z(Lp[2]);
-//     Eigen::Vector3d theta;
-    
-//     if(pow(x, 2) + pow(y, 2) - pow(l1,2) < 0) //
-//         F = l1;
-//     else
-//         F=sqrt(pow(x, 2) + pow(y, 2) - pow(l1,2));//
-
-
-//     G = F;
-//     H = sqrt(pow(G, 2) + pow(z, 2));
-
-//     theta[0] = atan2(y, x) + atan2(F, -l1);//
-
-//     D=(pow(H, 2) - pow(l2, 2) - pow(l3, 2))/(2 * l2 * l3);
-//     if(-1 < D || D < 1)
-//         theta[2] = acos(D);
-//     else
-//         theta[2] = 0;
-
-    
-//     theta[1] = atan2(-z,G) - atan2(l3 * sin(theta[2]), l2 + l3 * cos(theta[2]));
-//     // std::cout << "legik result : " << theta << std::endl;
-//     return theta;
-
-// }
 
 Eigen::VectorXd CalcIK(Eigen::Vector3d Center, Eigen::Vector3d Rotation, Eigen::Matrix4d LegPositon)
 {
@@ -379,6 +313,36 @@ Eigen::VectorXd CalcIK(Eigen::Vector3d Center, Eigen::Vector3d Rotation, Eigen::
 
 }
 
+// Eigen::Vector3d LegIK(Eigen::Vector4d Lp)
+// {
+    
+//     double D, F, G, H;
+//     double x(Lp[0]), y(Lp[1]), z(Lp[2]);
+//     Eigen::Vector3d theta;
+    
+//     if(pow(x, 2) + pow(y, 2) - pow(l1,2) < 0) //
+//         F = l1;
+//     else
+//         F=sqrt(pow(x, 2) + pow(y, 2) - pow(l1,2));//
+
+
+//     G = F;
+//     H = sqrt(pow(G, 2) + pow(z, 2));
+
+//     theta[0] = atan2(y, x) + atan2(F, -l1);//
+
+//     D=(pow(H, 2) - pow(l2, 2) - pow(l3, 2))/(2 * l2 * l3);
+//     if(-1 < D || D < 1)
+//         theta[2] = acos(D);
+//     else
+//         theta[2] = 0;
+
+    
+//     theta[1] = atan2(-z,G) - atan2(l3 * sin(theta[2]), l2 + l3 * cos(theta[2]));
+//     // std::cout << "legik result : " << theta << std::endl;
+//     return theta;
+
+// }
 
 // std::vector<Eigen::Matrix4d> BodyIK(Eigen::Vector3d rot, Eigen::Vector3d center)
 // {

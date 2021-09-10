@@ -41,7 +41,7 @@ public:
   const double StanceTime = 0.5; // 0 ~ 1
   const double V = 2.0;
   const double angle = 0.0;
-  std::vector<double> CurrentTime = createDomain(0.0, 1.0, 0.0001);
+  // std::vector<double> CurrentTime = createDomain(0.0, 1.0, 0.0001);
   Eigen::Vector3d rotation = {0, 0, 0};
   Eigen::Vector3d center = {0, 0, 0};
   std::vector<double> x, y, z;
