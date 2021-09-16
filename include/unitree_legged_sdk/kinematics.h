@@ -11,7 +11,7 @@
 // #include "supportLib.hpp"
 
 const double pi = M_PI; 
-double L(0.3610), W(0.094), height(0.28);
+double L(0.3610), W(0.094), height(0.30);
 double l1(0.0838), l2(0.2), l3(0.2);
 
 Eigen::Matrix4d TransRobotCenter2UpShoulder_1 = (Eigen::Matrix4d() <<   1, 0, 0, -W/2,    
@@ -74,6 +74,16 @@ double Rad2deg(double rad)
 {       
     double angle = rad * 180 / pi;
 
+    return angle;
+}
+
+Eigen::VectorXd Rad2deg(Eigen::VectorXd rad)
+{       
+    Eigen::VectorXd angle(12);
+    for(int i = 0; i < angle.size(); i++)
+    {
+        angle[i] = rad[i] * 180 / pi;
+    }
     return angle;
 }
 

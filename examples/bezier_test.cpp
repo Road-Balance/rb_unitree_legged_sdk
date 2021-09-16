@@ -168,43 +168,43 @@ void Custom::RobotControl()
         
         MotorRadian = CalcIK(center, rotation, RobotLegPosition);
         std::cout << RobotLegPosition << std:: endl;
-
-        std::cout <<  Rad2deg(MotorRadian[0]) << "    " <<
-                      Rad2deg(MotorRadian[1]) << "    " <<
-                      Rad2deg(MotorRadian[2]) << "    " <<std::endl;
-                      // Rad2deg(MotorRadian[9]) << "    " <<
-                      // Rad2deg(MotorRadian[10]) << "    " <<
-                      // Rad2deg(MotorRadian[11]) << std::endl;
+        std::cout << Rad2deg(MotorRadian).transpose() << std::endl;
+        // std::cout <<  Rad2deg(MotorRadian[0]) << "    " <<
+        //               Rad2deg(MotorRadian[1]) << "    " <<
+        //               Rad2deg(MotorRadian[2]) << "    " <<  //std::endl;
+        //               Rad2deg(MotorRadian[3]) << "    " <<
+        //               Rad2deg(MotorRadian[4]) << "    " <<
+        //               Rad2deg(MotorRadian[5]) << std::endl;
         
 
         if(StanceMode)
         {
-          ControlMotor(cmd, FL_0, 0.0);
-          ControlMotor(cmd, FL_1, (float)(-MotorRadian[1]), 3.0f);
-          ControlMotor(cmd, FL_2, (float)(-MotorRadian[2]), 3.0f);
+          ControlMotor(cmd, FR_0, 0.0);
+          ControlMotor(cmd, FR_1, (float)(-MotorRadian[4]), 3.0f);
+          ControlMotor(cmd, FR_2, (float)(-MotorRadian[5]), 3.0f);
 
           // ControlMotor(cmd, FL_0, 0.0);
           // ControlMotor(cmd, FL_1, (float)(-MotorRadian[4]), 3.0f);
           // ControlMotor(cmd, FL_2, (float)(-MotorRadian[5]), 3.0f);
   
-          // ControlMotor(cmd, RR_0, 0.0);
-          // ControlMotor(cmd, RR_1, (float)(-MotorRadian[10]), 3.0f);
-          // ControlMotor(cmd, RR_2, (float)(-MotorRadian[11]), 3.0f);          
+          ControlMotor(cmd, RR_0, 0.0);
+          ControlMotor(cmd, RR_1, (float)(-MotorRadian[10]), 3.0f);
+          ControlMotor(cmd, RR_2, (float)(-MotorRadian[11]), 3.0f);          
                  
         }
         else  // Swing
         {
-          ControlMotor(cmd, FL_0, 0.0);
-          ControlMotor(cmd, FL_1, (float)(-MotorRadian[1]));
-          ControlMotor(cmd, FL_2, (float)(-MotorRadian[2]));
+          ControlMotor(cmd, FR_0, 0.0);
+          ControlMotor(cmd, FR_1, (float)(-MotorRadian[4]));
+          ControlMotor(cmd, FR_2, (float)(-MotorRadian[5]));
 
           // ControlMotor(cmd, FL_0, 0.0);
           // ControlMotor(cmd, FL_1, (float)(-MotorRadian[4]));
           // ControlMotor(cmd, FL_2, (float)(-MotorRadian[5]));
           
-          // ControlMotor(cmd, RR_0, 0.0);
-          // ControlMotor(cmd, RR_1, (float)(-MotorRadian[10]));
-          // ControlMotor(cmd, RR_2, (float)(-MotorRadian[11]));
+          ControlMotor(cmd, RR_0, 0.0);
+          ControlMotor(cmd, RR_1, (float)(-MotorRadian[10]));
+          ControlMotor(cmd, RR_2, (float)(-MotorRadian[11]));
              
         }
 
