@@ -90,6 +90,7 @@ double radToDeg(double rad){
 	return T10*T21r*T21t*T32*id;
 }*/
 
+// 조인트에서 조인트로 가는 변환의 역변환을 만들어주는 함수(ht의 역변환 리턴)
 Eigen::Matrix4d invHT(Eigen::Matrix4d ht){
 	Eigen::Matrix3d rotInv = (ht.block<3,3>(0,0)).transpose();	
 	Eigen::Matrix4d ret = Eigen::MatrixXd::Identity(4,4);
@@ -100,6 +101,8 @@ Eigen::Matrix4d invHT(Eigen::Matrix4d ht){
 	return ret;
 }
 
+
+// 몸통 질량중심 좌표계에서 hip joint로 가는 변환({B} -> {0}) 
 Eigen::Matrix4d bodyToHip(const int legID){
 	
 	const int FR = (legID/2)?(-1):(1);
@@ -114,6 +117,7 @@ Eigen::Matrix4d bodyToHip(const int legID){
 	return THB;
 }
 
+// hip joint에서 thigh joint로 가는 변환({1} -> {2})
 Eigen::Matrix4d hipToThigh(Eigen::Vector3d jointAngle, const int legID){
 	Eigen::Matrix4d TTH;
 	const int legParity = (legID%2)?(1):(-1);
@@ -126,7 +130,7 @@ Eigen::Matrix4d hipToThigh(Eigen::Vector3d jointAngle, const int legID){
 	return TTH;
 }
 
-
+// thigh joint에서 calf joint로 가는 변환({2} -> {3})
 Eigen::Matrix4d thighToCalf(Eigen::Vector3d jointAngle){
 	Eigen::Matrix4d TCT;
 
@@ -138,6 +142,7 @@ Eigen::Matrix4d thighToCalf(Eigen::Vector3d jointAngle){
 	return TCT;
 }
 
+// calf joint에서 foot(end-effector)로 가는 변환({3} -> {4})
 Eigen::Matrix4d calfToFoot(Eigen::Vector3d jointAngle){
 	Eigen::Matrix4d TFC;
 
@@ -149,11 +154,13 @@ Eigen::Matrix4d calfToFoot(Eigen::Vector3d jointAngle){
 	return TFC;
 }
 
+// hip joint 좌표계에서 본 foot(end-effector)의 x, y, z 좌표 리턴
 Eigen::Vector4d legFK(Eigen::Vector3d jointAngle, const int legID){
 	Eigen::Vector4d id(0, 0, 0, 1);
 	return hipToThigh(jointAngle, legID)*thighToCalf(jointAngle)*calfToFoot(jointAngle)*id;
 }
 
+// 몸통 질량 중심 좌표계에서 본 foot(end-effector)의 x, y, z 좌표 리턴
 Eigen::Vector4d bodyFK(Eigen::Vector3d jointAngle, const int legID){
 	Eigen::Vector4d id(0, 0, 0, 1);
 	return bodyToHip(legID)*hipToThigh(jointAngle, legID)*thighToCalf(jointAngle)*calfToFoot(jointAngle)*id;
