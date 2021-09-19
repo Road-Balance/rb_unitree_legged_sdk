@@ -22,8 +22,8 @@
 #include <Eigen/Core>
 #endif
 
-#ifndef EIGEN_DENSE_H
-#include <Eigen/Dense>
+#ifndef EIGEN_GEOMETRY_MODULE_H
+#include <Eigen/Geometry>
 #endif
 
 #ifndef RB_KINEMATICS_H
@@ -51,10 +51,10 @@ double radToDeg(double rad){
 	return r;
 }
 
-
-//FK and transformations
-
-/*Eigen::Vector4d legFK(Eigen::Vector3d jointAngle, const int legParity){
+// Old FK
+/*
+ *
+ Eigen::Vector4d legFK(Eigen::Vector3d jointAngle, const int legParity){
 	//jointAngle : (q1, q2, q3)
 	//legParity : -1 if left, 1 if right
 	//Homogeneous Transformations T10 ~ T32 should be applied in reverse of the following order (starts from T32)
@@ -88,12 +88,18 @@ double radToDeg(double rad){
 	
 	Eigen::Vector4d id(0,0,0,1);
 	return T10*T21r*T21t*T32*id;
-}*/
+}
+*
+*/
 
-// 조인트에서 조인트로 가는 변환의 역변환을 만들어주는 함수(ht의 역변환 리턴)
+
+
+
+//FK and transformations
+
 Eigen::Matrix4d invHT(Eigen::Matrix4d ht){
-	Eigen::Matrix3d rotInv = (ht.block<3,3>(0,0)).transpose();	
-	Eigen::Matrix4d ret = Eigen::MatrixXd::Identity(4,4);
+	Eigen::Matrix3d rotInv((ht.block<3,3>(0,0)).transpose());	
+	Eigen::Matrix4d ret(Eigen::MatrixXd::Identity(4,4));
 	
 	ret.block<3,3>(0,0) = rotInv;
 	ret.block<3,1>(0,3) = -rotInv * ht.block<3,1>(0,3);
@@ -101,23 +107,20 @@ Eigen::Matrix4d invHT(Eigen::Matrix4d ht){
 	return ret;
 }
 
-
-// 몸통 질량중심 좌표계에서 hip joint로 가는 변환({B} -> {0}) 
 Eigen::Matrix4d bodyToHip(const int legID){
 	
-	const int FR = (legID/2)?(-1):(1);
-	const int RL = (legID%2)?(1):(-1);
+	const int frParity = (legID/2)?(-1):(1);
+	const int lrParity = (legID%2)?(1):(-1);
 	Eigen::Matrix4d THB;
 
-	THB << 1, 0, 0, FR*L/2,
-	       0, 1, 0, RL*W/2,
+	THB << 1, 0, 0, frParity*L/2,
+	       0, 1, 0, lrParity*W/2,
 	       0, 0, 1, 0, 
 	       0, 0, 0, 1;
 	
 	return THB;
 }
 
-// hip joint에서 thigh joint로 가는 변환({1} -> {2})
 Eigen::Matrix4d hipToThigh(Eigen::Vector3d jointAngle, const int legID){
 	Eigen::Matrix4d TTH;
 	const int legParity = (legID%2)?(1):(-1);
@@ -130,7 +133,7 @@ Eigen::Matrix4d hipToThigh(Eigen::Vector3d jointAngle, const int legID){
 	return TTH;
 }
 
-// thigh joint에서 calf joint로 가는 변환({2} -> {3})
+
 Eigen::Matrix4d thighToCalf(Eigen::Vector3d jointAngle){
 	Eigen::Matrix4d TCT;
 
@@ -142,7 +145,6 @@ Eigen::Matrix4d thighToCalf(Eigen::Vector3d jointAngle){
 	return TCT;
 }
 
-// calf joint에서 foot(end-effector)로 가는 변환({3} -> {4})
 Eigen::Matrix4d calfToFoot(Eigen::Vector3d jointAngle){
 	Eigen::Matrix4d TFC;
 
@@ -154,13 +156,11 @@ Eigen::Matrix4d calfToFoot(Eigen::Vector3d jointAngle){
 	return TFC;
 }
 
-// hip joint 좌표계에서 본 foot(end-effector)의 x, y, z 좌표 리턴
 Eigen::Vector4d legFK(Eigen::Vector3d jointAngle, const int legID){
 	Eigen::Vector4d id(0, 0, 0, 1);
 	return hipToThigh(jointAngle, legID)*thighToCalf(jointAngle)*calfToFoot(jointAngle)*id;
 }
 
-// 몸통 질량 중심 좌표계에서 본 foot(end-effector)의 x, y, z 좌표 리턴
 Eigen::Vector4d bodyFK(Eigen::Vector3d jointAngle, const int legID){
 	Eigen::Vector4d id(0, 0, 0, 1);
 	return bodyToHip(legID)*hipToThigh(jointAngle, legID)*thighToCalf(jointAngle)*calfToFoot(jointAngle)*id;
@@ -172,14 +172,14 @@ Eigen::Vector4d bodyFK(Eigen::Vector3d jointAngle, const int legID){
 
 //IK
 
-Eigen::Vector3d legIK(Eigen::Vector4d legPosition, const int legParity, const int q3Parity){
+Eigen::Vector3d legIK(Eigen::Vector4d legPosition, const int legID, const int q3Parity){
 	//legPosition : position of the end-effector with respect to each hip joint
-	//legParity : -1 if left, 1 if right
+	//legID : FR -> 0, FL -> 1, RR -> 2, RL -> 3
 	//q3Parity : decides L3 configuration
 	
 	double R1, R2, R3;
 	double x(legPosition[0]), y(legPosition[1]), z(legPosition[2]);
-
+	const int legParity = (legID%2)?(1):(-1);
 	Eigen::Vector3d IKResult;	//IKResult : (q1, q2, q3)
 	
 	R1 = sqrt(pow(y, 2) + pow(z, 2) - pow(l1, 2));		//R1 : y2 distance from hip joint to end-effector
@@ -189,18 +189,14 @@ Eigen::Vector3d legIK(Eigen::Vector4d legPosition, const int legParity, const in
 	if(R3 > 1 || R3 < -1) R3 = floor(R3);
 	IKResult[2] = q3Parity*acos(R3);						// q3
 	IKResult[1] = atan2(-x, R1)-atan2(l3*sin(IKResult[2]),l2+l3*cos(IKResult[2]));	// q2
-	IKResult[0] = atan2(z, y)+atan2(R1, -l1*legParity);				// q1
+	IKResult[0] = atan2(z, y)+atan2(R1, l1*legParity);				// q1
 	
 	return IKResult; 
 }
 
 Eigen::Vector3d bodyIK(Eigen::Vector4d bodyPosition, const int legID, const int q3Parity){
-	
-	Eigen::Vector4d mul(-1, -1, -1, 1);
-	Eigen::Vector4d hipPosition((-1*hipFK(legID))*(mul.asDiagonal())*bodyPosition);
-	const int legParity = (legID%2)?(1):(-1);
-
-	return legIK(hipPosition, legParity, q3Parity);
+	Eigen::Vector4d hipPosition(invHT(bodyToHip(legID))*bodyPosition);
+	return legIK(hipPosition, legID, q3Parity);
 
 }
 
