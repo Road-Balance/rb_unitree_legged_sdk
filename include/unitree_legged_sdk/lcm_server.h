@@ -37,7 +37,7 @@ void Lcm_Server_Low::LCMRecv()
     if(mylcm.lowCmdLCMHandler.isrunning){
         pthread_mutex_lock(&mylcm.lowCmdLCMHandler.countMut);
         mylcm.lowCmdLCMHandler.counter++;
-        if(mylcm.lowCmdLCMHandler.counter > 10){
+        if(mylcm.lowCmdLCMHandler.counter > 50){
             printf("Error! LCM Time out.\n");
             exit(-1);              // can be commented out
         }
