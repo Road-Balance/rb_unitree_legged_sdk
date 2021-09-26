@@ -38,7 +38,7 @@
 #define l3 0.2
 #define L 0.3610
 #define W 0.094
-
+#define ET pow(10, -10)
 
 
 
@@ -186,7 +186,10 @@ Eigen::Vector3d legIK(Eigen::Vector4d legPosition, const int legID, const int q3
 	R2 = sqrt(pow(R1, 2) + pow(x, 2)); 			//R2 : distance from hip joint to end-effector
 	R3 = (pow(R2, 2)-pow(l2, 2)-pow(l3, 2))/(2*l2*l3);
 
-	if(R3 > 1 || R3 < -1) R3 = floor(R3);
+	// Double precision is ~10^-15.9. Due to this, cmath arccos function returns nan when x > 1+10^-15 or x < -(1+10^-15)
+	// Considering double precision error propagation, the order of the error while calculating R3 will be about ~2*10^-16(nominal)
+	// But the exact error of R3 depends on how far the end-effector moved from the zero-point, so let's just make a paramter 'error threshold' -> ET
+	if(R3 > 1+ET || R3 < -(1+ET)) (R3>0)?(1):(-1);
 	IKResult[2] = q3Parity*acos(R3);						// q3
 	IKResult[1] = atan2(-x, R1)-atan2(l3*sin(IKResult[2]),l2+l3*cos(IKResult[2]));	// q2
 	IKResult[0] = atan2(z, y)+atan2(R1, l1*legParity);				// q1
