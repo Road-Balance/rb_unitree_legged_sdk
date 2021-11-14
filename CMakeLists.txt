@@ -29,6 +29,9 @@ target_link_libraries(example_walk ${EXTRA_LIBS})
 add_executable(rb_test examples/rb_test.cpp)
 target_link_libraries(rb_test ${EXTRA_LIBS})
 
+add_executable(example_dance examples/example_dance.cpp)
+target_link_libraries(example_dance ${EXTRA_LIBS})
+
 add_executable(bezier_test examples/bezier_test.cpp)
 target_link_libraries(bezier_test ${EXTRA_LIBS})
 
@@ -55,3 +58,7 @@ target_link_libraries(udp_recv_test ${EXTRA_LIBS})
 # lcm server
 add_executable(lcm_server examples/lcm_server.cpp)
 target_link_libraries(lcm_server ${EXTRA_LIBS})
+
+add_subdirectory(pybind11)
+pybind11_add_module(robot_interface_high_level src/python_interface_high_cmd.cpp)
+target_link_libraries(robot_interface_high_level ${EXTRA_LIBS})
