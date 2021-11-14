@@ -12,16 +12,15 @@ using namespace UNITREE_LEGGED_SDK;
 
 class Custom {
 public:
-  //   Custom(uint8_t level)
-  //       : safe(LeggedType::A1),
-  //         udp(8080, "192.168.123.161", 8082, sizeof(HighCmd),
-  //         sizeof(HighState)) {
-  //     udp.InitCmdData(cmd);
-  //   }
-
-  Custom(uint8_t level) : safe(LeggedType::A1), udp(level) {
+  Custom(uint8_t level)
+      : safe(LeggedType::A1),
+        udp(8080, "192.168.123.161", 8082, sizeof(HighCmd), sizeof(HighState)) {
     udp.InitCmdData(cmd);
   }
+
+  //   Custom(uint8_t level) : safe(LeggedType::A1), udp(level) {
+  //     udp.InitCmdData(cmd);
+  //   }
   void UDPRecv();
   void UDPSend();
   void RobotControl();
