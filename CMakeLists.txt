@@ -26,6 +26,9 @@ target_link_libraries(example_torque ${EXTRA_LIBS})
 add_executable(example_walk examples/example_walk.cpp)
 target_link_libraries(example_walk ${EXTRA_LIBS})
 
+add_executable(stairs_climbing examples/stairs_climbing.cpp)
+target_link_libraries(stairs_climbing ${EXTRA_LIBS})
+
 add_executable(rb_test examples/rb_test.cpp)
 target_link_libraries(rb_test ${EXTRA_LIBS})
 
